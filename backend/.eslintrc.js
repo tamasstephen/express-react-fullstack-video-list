@@ -14,7 +14,12 @@ module.exports = {
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
+    tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
   rules: {},
+  env: {
+    browser: true,
+    node: true,
+  },
 };
