@@ -1,6 +1,6 @@
 import type { IJwtRequest } from "../../utils/auth";
 import { createJWT, protectRoute } from "../../utils/auth";
-import type { NextFunction, Request, Response } from "express";
+import type { Response } from "express";
 import jwt from "jsonwebtoken";
 
 jest.mock("jsonwebtoken", () => ({
