@@ -1,8 +1,19 @@
+import { handleLogin, handleRegister } from "../handlers/userHandler";
+import { protectRoute } from "../utils/auth";
+import type { Request, Response } from "express";
 import { Router } from "express";
 
 export const userRouter = Router();
 
-userRouter.get("/user", (req, res) => {
+userRouter.post("/register", (req: Request, res: Response) => {
+  handleRegister(req, res);
+});
+
+userRouter.post("/login", (req: Request, res: Response) => {
+  handleLogin(req, res);
+});
+
+userRouter.get("/user", protectRoute, (req, res) => {
   res.json("Hello user route!");
 });
 
