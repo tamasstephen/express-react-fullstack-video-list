@@ -2,7 +2,7 @@ import type { User } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-interface IJwtRequest extends Request {
+export interface IJwtRequest extends Request {
   cookies: { token?: string };
 }
 

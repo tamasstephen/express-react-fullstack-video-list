@@ -1,8 +1,14 @@
-import { createJWT } from "../../utils/auth";
+import type { IJwtRequest } from "../../utils/auth";
+import { createJWT, protectRoute } from "../../utils/auth";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 jest.mock("jsonwebtoken", () => ({
   sign: jest.fn((payload: object, secret: string) => "mocked-token"),
+  verify: jest.fn((token: string, secretOrPublicKey: string) => {
+    if (token === "valid-token") return true;
+    return false;
+  }),
 }));
 
 describe("createJWT", () => {
@@ -43,5 +49,82 @@ describe("createJWT", () => {
     expect(() => {
       createJWT(mockUser);
     }).toThrow("Mocked signing error");
+  });
+});
+
+describe("protectRoute", () => {
+  const mockRequest: Partial<IJwtRequest> = {
+    cookies: {
+      token: "valid-token",
+    },
+  };
+  const mockResponse: Partial<Response> = {
+    status: jest.fn().mockReturnThis(),
+    json: jest.fn(),
+  };
+  const mockNext = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should grant access if a valid token is provided", () => {
+    protectRoute(
+      mockRequest as IJwtRequest,
+      mockResponse as Response,
+      mockNext
+    );
+
+    expect(mockNext).toHaveBeenCalled();
+    expect(mockResponse.status).not.toHaveBeenCalled();
+    expect(mockResponse.json).not.toHaveBeenCalled();
+  });
+
+  test("should deny access if no token is provided", () => {
+    const requestWithoutToken: Partial<IJwtRequest> = {
+      cookies: {},
+    };
+
+    protectRoute(
+      requestWithoutToken as IJwtRequest,
+      mockResponse as Response,
+      mockNext
+    );
+
+    expect(mockNext).not.toHaveBeenCalled();
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: "Not authorized" });
+  });
+
+  test("should deny access if an invalid token is provided", () => {
+    const requestWithInvalidToken: Partial<IJwtRequest> = {
+      cookies: {
+        token: "invalid-token",
+      },
+    };
+
+    protectRoute(
+      requestWithInvalidToken as IJwtRequest,
+      mockResponse as Response,
+      mockNext
+    );
+
+    expect(mockNext).not.toHaveBeenCalled();
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: "Not authorized" });
+  });
+
+  test("should handle missing cookies property in the request", () => {
+    const requestWithoutCookies: Partial<IJwtRequest> = {};
+
+    protectRoute(
+      requestWithoutCookies as IJwtRequest,
+      mockResponse as Response,
+      mockNext
+    );
+
+    expect(mockNext).not.toHaveBeenCalled();
+    expect(mockResponse.status).toHaveBeenCalledWith(401);
+    expect(mockResponse.json).toHaveBeenCalledWith({ error: "Not authorized" });
   });
 });
