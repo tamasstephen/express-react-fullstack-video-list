@@ -2,6 +2,7 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    node: true,
   },
   extends: [
     "eslint:recommended",
@@ -17,9 +18,7 @@ module.exports = {
     tsconfigRootDir: __dirname,
   },
   plugins: ["@typescript-eslint"],
-  rules: {},
-  env: {
-    browser: true,
-    node: true,
+  rules: {
+    "no-process-env": "off",
   },
 };
