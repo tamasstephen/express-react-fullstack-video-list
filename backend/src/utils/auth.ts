@@ -30,8 +30,14 @@ export const protectRoute = (
 ) => {
   const authToken = req.cookies?.token;
   if (authToken) {
-    const token = jwt.verify(authToken, process.env.JWT_SECRET as string);
-    if (token) return next();
+    try {
+      const token = jwt.verify(authToken, process.env.JWT_SECRET as string);
+      if (token) return next();
+    } catch (error) {
+      res.status(401).json({ error: "Not a valid token" });
+      return;
+    }
   }
   res.status(401).json({ error: "Not authorized" });
+  return;
 };

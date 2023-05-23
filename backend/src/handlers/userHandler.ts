@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export const handleLogin = async (req: Request, res: Response) => {
   const data = req.body as { email: string; password: string };
-  if (!data || !data?.email || !data?.password) {
+  if (!data?.email || !data?.password) {
     res.status(400).json({ error: "Missing email or password" });
   }
   const { email, password } = data;
