@@ -1,7 +1,5 @@
-"use client";
-
 import LogRegForm from "../components/LogRegForm";
 
-export default function Login() {
+export default function Register() {
   return <LogRegForm />;
 }
