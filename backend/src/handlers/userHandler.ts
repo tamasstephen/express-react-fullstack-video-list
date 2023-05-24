@@ -1,5 +1,5 @@
+import prisma from "../data/prisma";
 import { createJWT } from "../utils/auth";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 
@@ -8,8 +8,6 @@ type UserInputType = {
   password: string;
   name?: string;
 };
-
-const prisma = new PrismaClient();
 
 export const handleLogin = async (req: Request, res: Response) => {
   const data = req.body as { email: string; password: string };
