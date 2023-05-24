@@ -8,7 +8,7 @@ import Input from "./Input";
 type FormBody = {
   email: string;
   password: string;
-  name?: string;
+  username?: string;
 };
 
 export default function LogRegForm() {
@@ -26,7 +26,7 @@ export default function LogRegForm() {
       password: form.password.value,
     };
     if (pathName === "/register") {
-      bodyData["name"] = form.username.value;
+      bodyData["username"] = form.username.value;
     }
     const body = JSON.stringify(bodyData);
     const res = await fetch(
@@ -67,7 +67,7 @@ export default function LogRegForm() {
         {pathName === "/register" && (
           <Input
             label="Username"
-            htmlProps={{ type: "text", id: "name", name: "username" }}
+            htmlProps={{ type: "text", id: "username", name: "username" }}
           />
         )}
         <Input

@@ -13,7 +13,6 @@ export const userRouter = Router();
 const checkUserDataChain = () => {
   return [
     body("email").notEmpty().isEmail().normalizeEmail(),
-    body("name").notEmpty().trim().escape(),
     body("password").notEmpty().trim().escape(),
   ];
 };
@@ -21,6 +20,7 @@ const checkUserDataChain = () => {
 userRouter.post(
   "/register",
   checkUserDataChain(),
+  body("username").notEmpty().trim().escape(),
   (req: Request, res: Response) => {
     const result = validationResult(req);
     if (result.isEmpty()) {

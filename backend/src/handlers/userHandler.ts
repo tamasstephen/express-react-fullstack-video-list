@@ -66,14 +66,10 @@ const userAlreadyExists = async (email: string, name: string) => {
   });
 };
 
-const createUser = async ({
-  email,
-  password,
-  username: name,
-}: UserInputType) => {
+const createUser = async ({ email, password, username }: UserInputType) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   return prisma.user.create({
-    data: { email, name, password: hashedPassword },
+    data: { email, name: username, password: hashedPassword },
     select: {
       id: true,
       name: true,
