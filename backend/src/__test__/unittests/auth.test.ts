@@ -25,7 +25,7 @@ describe("createJWT", () => {
     const token = createJWT(mockUser);
 
     expect(jwt.sign).toHaveBeenCalledWith(
-      { id: "123", email: "test@example.com" },
+      { id: mockUser.id, name: mockUser.name },
       expect.any(String)
     );
 
@@ -36,7 +36,7 @@ describe("createJWT", () => {
     createJWT(mockUser);
 
     expect(jwt.sign).toHaveBeenCalledWith(
-      { id: "123", email: "test@example.com" },
+      { id: mockUser.id, name: mockUser.name },
       process.env.JWT_SECRET
     );
   });

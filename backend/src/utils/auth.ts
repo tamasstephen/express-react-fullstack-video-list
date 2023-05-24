@@ -6,10 +6,10 @@ export interface IJwtRequest extends Request {
   cookies: { token?: string };
 }
 
-export const createJWT = ({ id, email }: User) => {
+export const createJWT = ({ id, name }: Pick<User, "name" | "id">) => {
   const payload = {
     id,
-    email,
+    name,
   };
   const token = jwt.sign(payload, process.env.JWT_SECRET as string);
   return token;

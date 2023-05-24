@@ -6,14 +6,19 @@ import type { Request, Response } from "express";
 type UserInputType = {
   email: string;
   password: string;
-  name?: string;
+  username: string;
 };
 
 export const handleLogin = async (req: Request, res: Response) => {
-  const data = req.body as { email: string; password: string };
+  const data = req.body as Pick<UserInputType, "email" | "password">;
   const { email, password } = data;
   const user = await prisma.user.findUnique({
     where: { email },
+    select: {
+      id: true,
+      name: true,
+      password: true,
+    },
   });
   if (!user) {
     res.status(400).json({ error: "Invalid email or password" });
@@ -27,7 +32,10 @@ export const handleLogin = async (req: Request, res: Response) => {
   res.cookie("token", token, {
     httpOnly: true,
   });
-  res.json({ message: "Logged in", user: { email: user.email } });
+  res.json({
+    message: "Logged in",
+    user: { name: user.name },
+  });
 };
 
 const isValidPassword = async (password: string, hashedPassword: string) => {
@@ -36,14 +44,14 @@ const isValidPassword = async (password: string, hashedPassword: string) => {
 
 export const handleRegister = async (req: Request, res: Response) => {
   const data = req.body as UserInputType;
-  const { email, password, name } = data;
-  if (await userAlreadyExists(email)) {
+  const { email, username } = data;
+  if (await userAlreadyExists(email, username)) {
     res.status(400).json({ error: "User already exists" });
     return;
   }
-  const user = await createUser(email, password, name);
+  const user = await createUser(data);
   const userPayload = {
-    email: user.email,
+    name: user.name,
   };
   const token = createJWT(user);
   res.cookie("token", token, {
@@ -52,18 +60,24 @@ export const handleRegister = async (req: Request, res: Response) => {
   res.json({ user: userPayload, message: "Logged in" });
 };
 
-const userAlreadyExists = (email: string) => {
-  return prisma.user.findUnique({ where: { email } });
+const userAlreadyExists = async (email: string, name: string) => {
+  return await prisma.user.findFirst({
+    where: { OR: [{ email }, { name }] },
+  });
 };
 
-const createUser = async (email: string, password: string, name?: string) => {
+const createUser = async ({
+  email,
+  password,
+  username: name,
+}: UserInputType) => {
   const hashedPassword = await bcrypt.hash(password, 10);
-  const userData: UserInputType = { email, password: hashedPassword };
-  if (name) {
-    userData["name"] = name;
-  }
   return prisma.user.create({
-    data: userData,
+    data: { email, name, password: hashedPassword },
+    select: {
+      id: true,
+      name: true,
+    },
   });
 };
 

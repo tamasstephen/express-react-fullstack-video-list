@@ -13,6 +13,7 @@ export const userRouter = Router();
 const checkUserDataChain = () => {
   return [
     body("email").notEmpty().isEmail().normalizeEmail(),
+    body("name").notEmpty().trim().escape(),
     body("password").notEmpty().trim().escape(),
   ];
 };
@@ -51,18 +52,10 @@ userRouter.post("/logout", (req: Request, res: Response) => {
   handleLogout(req, res);
 });
 
-userRouter.get("/user", protectRoute, (req, res) => {
-  res.json("Hello user route!");
-});
-
-userRouter.get("/user/:id", (req, res) => {
+userRouter.get("/user/:id", protectRoute, (req, res) => {
   res.json(`Hello user ${req.params.id} route!`);
 });
 
-userRouter.post("/user", (req, res) => {
-  res.json("Creating user");
-});
-
-userRouter.put("/user/:id", (req, res) => {
+userRouter.put("/user/:id", protectRoute, (req, res) => {
   res.json(`Updating user ${req.params.id}`);
 });
