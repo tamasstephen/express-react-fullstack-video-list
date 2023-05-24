@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useUserContext } from "@/app/UserContext";
 import Button from "@/app/components/Button";
 import Input from "./Input";
 
@@ -11,6 +12,7 @@ type FormBody = {
 };
 
 export default function LogRegForm() {
+  const { user, setUser } = useUserContext();
   const pathName = usePathname();
   const pageH1 =
     pathName === "/register" ? "Register to Vidia" : "Log in to Vidia";
@@ -36,7 +38,12 @@ export default function LogRegForm() {
         body,
       }
     );
-    const data = await res.json();
+    if (res.status === 200) {
+      const data = await res.json();
+      console.log("The data is:", data);
+      setUser({ type: "login", payload: data });
+      console.log("The user is:", user);
+    }
   }
 
   return (

@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, createContext, useReducer } from "react";
+import { Dispatch, createContext, useContext, useReducer } from "react";
 
 interface User {
   id: number;
@@ -8,10 +8,13 @@ interface User {
   email?: string;
 }
 
-function userReducer(
-  state: User | null,
-  action: { type: string; payload: User }
-) {
+type UserReducerPayload = { type: string; payload: null | User };
+interface UserContextType {
+  user: User | null;
+  setUser: Dispatch<UserReducerPayload>;
+}
+
+function userReducer(state: User | null, action: UserReducerPayload) {
   switch (action.type) {
     case "login":
       return action.payload;
@@ -20,11 +23,6 @@ function userReducer(
     default:
       throw new Error();
   }
-}
-
-interface UserContextType {
-  user: User | null;
-  setUser: Dispatch<{ type: string; payload: User }>;
 }
 
 const UserContext = createContext<UserContextType>({
@@ -44,3 +42,5 @@ export const UserContextPorvider = ({
     </UserContext.Provider>
   );
 };
+
+export const useUserContext = () => useContext(UserContext);
