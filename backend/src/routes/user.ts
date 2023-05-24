@@ -1,4 +1,8 @@
-import { handleLogin, handleRegister } from "../handlers/userHandler";
+import {
+  handleLogin,
+  handleLogout,
+  handleRegister,
+} from "../handlers/userHandler";
 import { protectRoute } from "../utils/auth";
 import type { Request, Response } from "express";
 import { Router } from "express";
@@ -11,6 +15,10 @@ userRouter.post("/register", (req: Request, res: Response) => {
 
 userRouter.post("/login", (req: Request, res: Response) => {
   handleLogin(req, res);
+});
+
+userRouter.post("/logout", (req: Request, res: Response) => {
+  handleLogout(req, res);
 });
 
 userRouter.get("/user", protectRoute, (req, res) => {
