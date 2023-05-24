@@ -1,11 +1,13 @@
+import Navigation from "../components/Navigation";
+
 export default function UsersLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between mt-32">
-      <div>{children}</div>
+    <main className="flex flex-col h-full items-center justify-center min-h-[65vh]">
+      {children}
     </main>
   );
 }
