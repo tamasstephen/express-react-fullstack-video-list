@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useUserContext } from "@/app/UserContext";
 import Button from "@/app/components/Button";
 import Input from "./Input";
@@ -14,6 +14,7 @@ type FormBody = {
 export default function LogRegForm() {
   const { user, setUser } = useUserContext();
   const pathName = usePathname();
+  const router = useRouter();
   const pageH1 =
     pathName === "/register" ? "Register to Vidia" : "Log in to Vidia";
 
@@ -40,7 +41,11 @@ export default function LogRegForm() {
     );
     if (res.status === 200) {
       const data = await res.json();
-      setUser({ type: "login", payload: data });
+      setUser({ type: "login", payload: data.user });
+      router.push("/");
+    } else if (res.status === 401 || res.status === 400) {
+      const data = await res.json();
+      console.log(data);
     }
     // TODO: handle errors
   }
@@ -69,7 +74,9 @@ export default function LogRegForm() {
           label="Password"
           htmlProps={{ type: "password", id: "password", name: "password" }}
         />
-        <Button attributes={{ type: "submit" }}>Continue</Button>
+        <Button buttonType="primary" attributes={{ type: "submit" }}>
+          Continue
+        </Button>
       </form>
     </>
   );
