@@ -40,10 +40,9 @@ export default function LogRegForm() {
     );
     if (res.status === 200) {
       const data = await res.json();
-      console.log("The data is:", data);
       setUser({ type: "login", payload: data });
-      console.log("The user is:", user);
     }
+    // TODO: handle errors
   }
 
   return (

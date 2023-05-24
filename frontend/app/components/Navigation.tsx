@@ -13,7 +13,6 @@ export default function Navigation() {
       },
     });
     const data = await res.json();
-    console.log(data);
     setUser({ type: "logout", payload: null });
   }
 

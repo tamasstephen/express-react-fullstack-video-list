@@ -13,9 +13,6 @@ const prisma = new PrismaClient();
 
 export const handleLogin = async (req: Request, res: Response) => {
   const data = req.body as { email: string; password: string };
-  if (!data?.email || !data?.password) {
-    res.status(400).json({ error: "Missing email or password" });
-  }
   const { email, password } = data;
   const user = await prisma.user.findUnique({
     where: { email },
@@ -41,9 +38,6 @@ const isValidPassword = async (password: string, hashedPassword: string) => {
 
 export const handleRegister = async (req: Request, res: Response) => {
   const data = req.body as UserInputType;
-  if (!data?.email || !data?.password) {
-    res.status(400).json({ error: "Missing email or password" });
-  }
   const { email, password, name } = data;
   if (await userAlreadyExists(email)) {
     res.status(400).json({ error: "User already exists" });
