@@ -1,4 +1,5 @@
 import prisma from "../data/prisma";
+import { createUser, getUserByEmail } from "../data/user";
 import { createJWT } from "../utils/auth";
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
@@ -12,33 +13,29 @@ type UserInputType = {
 export const handleLogin = async (req: Request, res: Response) => {
   const data = req.body as Pick<UserInputType, "email" | "password">;
   const { email, password } = data;
-  const user = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      id: true,
-      name: true,
-      password: true,
-    },
-  });
-  if (!user) {
-    res.status(400).json({ error: "Invalid email or password" });
-    return;
+  try {
+    const user = await getUserByEmail(email);
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      res.status(400).json({ error: "Invalid email or password" });
+      return;
+    }
+    const token = createJWT(user);
+    res.cookie("token", token, {
+      httpOnly: true,
+    });
+    res.json({
+      message: "Logged in",
+      user: { name: user.name },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error" });
   }
-  if (!(await isValidPassword(password, user.password))) {
-    res.status(400).json({ error: "Invalid email or password" });
-    return;
-  }
-  const token = createJWT(user);
-  res.cookie("token", token, {
-    httpOnly: true,
-  });
-  res.json({
-    message: "Logged in",
-    user: { name: user.name },
-  });
 };
 
-const isValidPassword = async (password: string, hashedPassword: string) => {
+export const isValidPassword = async (
+  password: string,
+  hashedPassword: string
+) => {
   return await bcrypt.compare(password, hashedPassword);
 };
 
@@ -49,7 +46,8 @@ export const handleRegister = async (req: Request, res: Response) => {
     res.status(400).json({ error: "User already exists" });
     return;
   }
-  const user = await createUser(data);
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+  const user = await createUser({ ...data, password: hashedPassword });
   const userPayload = {
     name: user.name,
   };
@@ -63,17 +61,6 @@ export const handleRegister = async (req: Request, res: Response) => {
 const userAlreadyExists = async (email: string, name: string) => {
   return await prisma.user.findFirst({
     where: { OR: [{ email }, { name }] },
-  });
-};
-
-const createUser = async ({ email, password, username }: UserInputType) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  return prisma.user.create({
-    data: { email, name: username, password: hashedPassword },
-    select: {
-      id: true,
-      name: true,
-    },
   });
 };
 
