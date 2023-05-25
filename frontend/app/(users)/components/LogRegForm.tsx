@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useUserContext } from "@/app/UserContext";
 import Button from "@/app/components/Button";
 import Input from "./Input";
+import { useForm, FieldValues } from "react-hook-form";
 
 type FormBody = {
   email: string;
@@ -15,18 +16,20 @@ export default function LogRegForm() {
   const { user, setUser } = useUserContext();
   const pathName = usePathname();
   const router = useRouter();
-  const pageH1 =
-    pathName === "/register" ? "Register to Vidia" : "Log in to Vidia";
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
+  async function submitForm(data: FieldValues) {
     const bodyData: FormBody = {
-      email: form.email.value,
-      password: form.password.value,
+      email: data.email,
+      password: data.password,
     };
     if (pathName === "/register") {
-      bodyData["username"] = form.username.value;
+      bodyData["username"] = data.username;
     }
     const body = JSON.stringify(bodyData);
     const res = await fetch(
@@ -45,7 +48,6 @@ export default function LogRegForm() {
       router.push("/");
     } else if (res.status === 401 || res.status === 400) {
       const data = await res.json();
-      console.log(data);
     }
     // TODO: handle errors
   }
@@ -53,27 +55,60 @@ export default function LogRegForm() {
   return (
     <>
       <h1 className="text-4xl font-bold text-center tracking-tight mb-8">
-        {pageH1}
+        {pathName === "/register" ? "Register to Vidia" : "Log in to Vidia"}
       </h1>
       <form
-        onSubmit={(event) => handleSubmit(event)}
+        onSubmit={handleSubmit((data) => submitForm(data))}
         className="grid gap-4 items-center justify-center w-full"
         action="post"
       >
         <Input
-          label="Email"
+          label="email"
           htmlProps={{ type: "email", id: "email", name: "email" }}
+          isRequired={true}
+          register={register}
+          validate={{
+            pattern: {
+              value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
+              message: "Invalid email address",
+            },
+          }}
         />
+        {errors.email && <p>Invalid email address</p>}
         {pathName === "/register" && (
-          <Input
-            label="Username"
-            htmlProps={{ type: "text", id: "username", name: "username" }}
-          />
+          <>
+            <Input
+              label="username"
+              htmlProps={{ type: "text", id: "username", name: "username" }}
+              isRequired={true}
+              register={register}
+              validate={{
+                minLength: {
+                  value: 3,
+                  message: "Password must be at least 8 characters long",
+                },
+              }}
+            />
+            {errors.username && (
+              <p>The username must be at least 3 characters long</p>
+            )}
+          </>
         )}
         <Input
-          label="Password"
+          label="password"
           htmlProps={{ type: "password", id: "password", name: "password" }}
+          isRequired={true}
+          register={register}
+          validate={{
+            minLength: {
+              value: 8,
+              message: "Password must be at least 8 characters long",
+            },
+          }}
         />
+        {errors.password && (
+          <p>The password must be at least 8 characters long</p>
+        )}
         <Button buttonType="primary" attributes={{ type: "submit" }}>
           Continue
         </Button>
