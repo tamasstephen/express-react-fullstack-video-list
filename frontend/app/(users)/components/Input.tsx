@@ -18,7 +18,7 @@ export default function Input({
 }: InputProps) {
   return (
     <div className="flex flex-col">
-      <label className="text-sm mb-1" htmlFor="email">
+      <label className="text-sm mb-1 capitalize" htmlFor="email">
         {label}
       </label>
       <input
