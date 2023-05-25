@@ -1,9 +1,11 @@
 import { useUserContext } from "@/app/UserContext";
+import { useClickOutSide } from "@/hooks/useClickOutside";
 import Link from "next/link";
 import { useState } from "react";
 
 export default function UserWidget() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const myRef = useClickOutSide(() => setIsMenuOpen(false));
   const { user, setUser } = useUserContext();
   const userInitials = user?.username
     .split(" ")
@@ -33,7 +35,10 @@ export default function UserWidget() {
         {userInitials}
       </button>
       {isMenuOpen && (
-        <div className="absolute top-12 right-0 w-48 bg-white rounded-md shadow-md">
+        <div
+          ref={myRef}
+          className="absolute top-12 right-0 w-48 bg-white rounded-md shadow-md"
+        >
           <ul className="flex flex-col text-sm">
             <li className="p-2 hover:bg-gray-100 cursor-pointer">
               <Link href="/profile">Profile</Link>
