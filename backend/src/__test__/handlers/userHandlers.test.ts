@@ -1,7 +1,7 @@
-import { handleLogin } from "../../handlers/userHandler";
+import { handleLogin, handleRegister } from "../../handlers/userHandler";
 import { createJWT } from "../../utils/auth"; // Import the necessary helper functions
 import type { Request, Response } from "express";
-import { createUser, getUserByEmail } from "../../data/user";
+import { createUser, getUserByEmail, userAlreadyExists } from "../../data/user";
 import bcrypt from "bcrypt";
 
 // Mock the Express Request and Response objects
@@ -36,6 +36,12 @@ jest.mock("../../data/user", () => ({
       username: string;
     }) => ({ id: "1", name: username })
   ),
+  userAlreadyExists: jest.fn((email: string, name: string) => {
+    if (email === "test@example.com") {
+      return false;
+    }
+    return true;
+  }),
 }));
 
 // Mock the bcrypt functions
@@ -95,7 +101,7 @@ describe("handleLogin", () => {
     (getUserByEmail as jest.Mock).mockResolvedValueOnce(null);
 
     reqMock.body = {
-      email: "test@example.com",
+      email: "invalid@example.com",
       password: "password",
     };
 
@@ -127,5 +133,89 @@ describe("handleLogin", () => {
     });
     expect(resMock.cookie).not.toHaveBeenCalled();
     expect(resMock.json).toHaveBeenCalledTimes(1);
+  });
+});
+
+const reqRegMock = {
+  body: {
+    email: "test@example.com",
+    username: "testuser",
+    password: "password123",
+    name: "Test User",
+  },
+} as unknown as Request;
+
+const resRegMock = {
+  status: jest.fn(() => resMock),
+  json: jest.fn(),
+  cookie: jest.fn(),
+} as unknown as Response;
+
+describe("handleRegister", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should handle successful user creation", async () => {
+    // Mock utility function responses
+    (userAlreadyExists as jest.Mock).mockResolvedValueOnce(false);
+    (createUser as jest.Mock).mockResolvedValueOnce({ name: "Test User" });
+    (createJWT as jest.Mock).mockReturnValueOnce("token");
+
+    await handleRegister(reqRegMock, resRegMock);
+
+    // Check the response
+    expect(resRegMock.cookie).toHaveBeenCalledWith("token", "token", {
+      httpOnly: true,
+    });
+    expect(resRegMock.json).toHaveBeenCalledWith({
+      user: { name: "Test User" },
+      message: "Logged in",
+    });
+  });
+
+  test("should handle user already exists with the given username", async () => {
+    // Mock utility function response
+    (userAlreadyExists as jest.Mock).mockResolvedValueOnce(true);
+
+    await handleRegister(reqRegMock, resRegMock);
+
+    // Check the response
+    expect(resRegMock.status).toHaveBeenCalledWith(400);
+    expect(resRegMock.json).toHaveBeenCalledWith({
+      error: "User already exists",
+    });
+  });
+
+  test("should handle user already exists with the provided email address", async () => {
+    // Mock utility function responses
+    (userAlreadyExists as jest.Mock).mockResolvedValueOnce(false);
+    (createUser as jest.Mock).mockRejectedValueOnce(
+      new Error("User creation failed")
+    );
+
+    await handleRegister(reqRegMock, resRegMock);
+
+    // Check the response
+    expect(resRegMock.status).toHaveBeenCalledWith(500);
+    expect(resRegMock.json).toHaveBeenCalledWith({
+      error: "Internal server error",
+    });
+  });
+
+  test("should handle an error during user creation", async () => {
+    // Mock utility function responses
+
+    (userAlreadyExists as jest.Mock).mockRejectedValueOnce(
+      new Error("User creation failed")
+    );
+
+    await handleRegister(reqRegMock, resRegMock);
+
+    // Check the response
+    expect(resRegMock.status).toHaveBeenCalledWith(500);
+    expect(resRegMock.json).toHaveBeenCalledWith({
+      error: "Internal server error",
+    });
   });
 });

@@ -28,3 +28,9 @@ export const createUser = async ({
     },
   });
 };
+
+export const userAlreadyExists = async (email: string, name: string) => {
+  return await prisma.user.findFirst({
+    where: { OR: [{ email }, { name }] },
+  });
+};
