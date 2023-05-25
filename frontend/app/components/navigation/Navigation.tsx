@@ -1,25 +1,16 @@
 "use client";
 
-import Wrapper from "./Wrapper";
-import { useUserContext } from "../UserContext";
-import Button from "./Button";
+import Wrapper from "../Wrapper";
+import { useUserContext } from "../../UserContext";
+import Button from "../Button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import UserWidget from "./UserWidget";
 
 export default function Navigation() {
   const router = useRouter();
-  async function handleLogout() {
-    const res = await fetch(`http://localhost:3001/logout`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-    setUser({ type: "logout", payload: null });
-  }
 
-  const { user, setUser } = useUserContext();
+  const { user } = useUserContext();
   return (
     <nav className="flex items-center justify-center flex-wrap border-b border-gray-300 p-4 w-full">
       <Wrapper>
@@ -43,9 +34,7 @@ export default function Navigation() {
             </button>
           </div>
           {user ? (
-            <Button buttonType="primary-sm" cb={handleLogout}>
-              Logout
-            </Button>
+            <UserWidget />
           ) : (
             <div className="flex items-center">
               <Link href="/login">

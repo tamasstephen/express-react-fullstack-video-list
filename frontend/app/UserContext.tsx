@@ -3,7 +3,6 @@
 import { Dispatch, createContext, useContext, useReducer } from "react";
 
 interface User {
-  id: number;
   username: string;
   email?: string;
 }

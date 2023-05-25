@@ -17,12 +17,12 @@ export default function Input({
   validate,
 }: InputProps) {
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-72">
       <label className="text-sm mb-1 capitalize" htmlFor="email">
         {label}
       </label>
       <input
-        className="h-8 p-2 rounded-md border border-gray-400"
+        className="h-8 p-2 rounded-md border border-gray-400 w-full"
         {...htmlProps}
         {...register(label, { required: isRequired, ...validate })}
       />

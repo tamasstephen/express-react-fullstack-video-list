@@ -6,6 +6,7 @@ import Button from "@/app/components/Button";
 import Input from "./Input";
 import { useForm, FieldValues } from "react-hook-form";
 import ErrorBar from "./ErrorBar";
+import { useState } from "react";
 
 type FormBody = {
   email: string;
@@ -17,6 +18,7 @@ export default function LogRegForm() {
   const { user, setUser } = useUserContext();
   const pathName = usePathname();
   const router = useRouter();
+  const [responseError, setResponseError] = useState<string[]>([]);
   const {
     register,
     handleSubmit,
@@ -45,19 +47,21 @@ export default function LogRegForm() {
     );
     if (res.status === 200) {
       const data = await res.json();
-      setUser({ type: "login", payload: data.user });
+      setUser({ type: "login", payload: { username: data.user.name } });
+      console.log(user);
       router.push("/");
     } else if (res.status === 401 || res.status === 400) {
       const data = await res.json();
+      setResponseError(() => [data.error]);
     }
-    // TODO: handle errors
   }
 
   return (
-    <>
-      <h1 className="text-4xl font-bold text-center tracking-tight mb-8">
+    <div className="flex flex-col items-center justify-center w-72">
+      <h1 className="text-4xl font-bold text-center tracking-tight mb-8 w-full">
         {pathName === "/register" ? "Register to Vidia" : "Log in to Vidia"}
       </h1>
+      {responseError.length > 0 && <ErrorBar errors={responseError} />}
       <form
         onSubmit={handleSubmit((data) => submitForm(data))}
         className="grid gap-4 items-center justify-center w-full"
@@ -118,6 +122,6 @@ export default function LogRegForm() {
           Continue
         </Button>
       </form>
-    </>
+    </div>
   );
 }

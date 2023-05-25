@@ -4,10 +4,10 @@ type ErrorBarProps = {
 
 export default function ErrorBar({ errors }: ErrorBarProps) {
   return (
-    <div className="bg-red-200 text-red-900 p-2 rounded-md mb-4">
+    <p className="bg-red-200 text-red-900 box-border p-2 rounded-md mb-4 w-full">
       {errors.map((error) => (
-        <p key={error}>{error}</p>
+        <span key={error}>{error}</span>
       ))}
-    </div>
+    </p>
   );
 }
