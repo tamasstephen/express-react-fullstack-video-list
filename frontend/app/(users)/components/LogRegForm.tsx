@@ -5,6 +5,7 @@ import { useUserContext } from "@/app/UserContext";
 import Button from "@/app/components/Button";
 import Input from "./Input";
 import { useForm, FieldValues } from "react-hook-form";
+import ErrorBar from "./ErrorBar";
 
 type FormBody = {
   email: string;
@@ -74,7 +75,7 @@ export default function LogRegForm() {
             },
           }}
         />
-        {errors.email && <p>Invalid email address</p>}
+        {errors.email && <ErrorBar errors={["Invalid email address"]} />}
         {pathName === "/register" && (
           <>
             <Input
@@ -90,7 +91,9 @@ export default function LogRegForm() {
               }}
             />
             {errors.username && (
-              <p>The username must be at least 3 characters long</p>
+              <ErrorBar
+                errors={["The username must be at least 3 characters long"]}
+              />
             )}
           </>
         )}
@@ -107,7 +110,9 @@ export default function LogRegForm() {
           }}
         />
         {errors.password && (
-          <p>The password must be at least 8 characters long</p>
+          <ErrorBar
+            errors={["The password must be at least 8 characters long"]}
+          />
         )}
         <Button buttonType="primary" attributes={{ type: "submit" }}>
           Continue
