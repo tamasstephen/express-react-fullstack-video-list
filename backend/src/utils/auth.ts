@@ -15,14 +15,6 @@ export const createJWT = ({ id, name }: Pick<User, "name" | "id">) => {
   return token;
 };
 
-export const addJWTCookie =
-  (token: string) => (_req: Request, res: Response, next: NextFunction) => {
-    res.cookie("token", token, {
-      httpOnly: true,
-    });
-    next();
-  };
-
 export const protectRoute = (
   req: IJwtRequest,
   res: Response,

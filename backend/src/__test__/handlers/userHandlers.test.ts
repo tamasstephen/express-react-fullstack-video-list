@@ -1,15 +1,36 @@
-import { handleLogin, handleRegister } from "../../handlers/userHandler";
-import { createJWT } from "../../utils/auth"; // Import the necessary helper functions
-import type { Request, Response } from "express";
 import { createUser, getUserByEmail, userAlreadyExists } from "../../data/user";
+import {
+  handleLogin,
+  handleLogout,
+  handleRegister,
+} from "../../handlers/userHandler";
+import { createJWT } from "../../utils/auth"; // Import the necessary helper functions
 import bcrypt from "bcrypt";
+import type { Request, Response } from "express";
 
-// Mock the Express Request and Response objects
+// Mock the Express Request and Response objects for login
 const reqMock = {} as Request;
 const resMock = {
   status: jest.fn().mockReturnThis(),
   json: jest.fn().mockReturnThis(),
   cookie: jest.fn().mockReturnThis(),
+} as unknown as Response;
+
+// Mock the Express Request and Response objects for registration
+const reqRegMock = {
+  body: {
+    email: "test@example.com",
+    username: "testuser",
+    password: "password123",
+    name: "Test User",
+  },
+} as unknown as Request;
+
+const resRegMock = {
+  status: jest.fn(() => resMock),
+  json: jest.fn(),
+  cookie: jest.fn(),
+  clearCookie: jest.fn(),
 } as unknown as Response;
 
 // Mock the jwt token creation function
@@ -136,21 +157,6 @@ describe("handleLogin", () => {
   });
 });
 
-const reqRegMock = {
-  body: {
-    email: "test@example.com",
-    username: "testuser",
-    password: "password123",
-    name: "Test User",
-  },
-} as unknown as Request;
-
-const resRegMock = {
-  status: jest.fn(() => resMock),
-  json: jest.fn(),
-  cookie: jest.fn(),
-} as unknown as Response;
-
 describe("handleRegister", () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -216,6 +222,22 @@ describe("handleRegister", () => {
     expect(resRegMock.status).toHaveBeenCalledWith(500);
     expect(resRegMock.json).toHaveBeenCalledWith({
       error: "Internal server error",
+    });
+  });
+});
+
+describe("handleLogout", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should handle successful logout", async () => {
+    await handleLogout(reqRegMock, resRegMock);
+
+    // Check the response
+    expect(resRegMock.clearCookie).toHaveBeenCalledWith("token");
+    expect(resRegMock.json).toHaveBeenCalledWith({
+      message: "Logged out",
     });
   });
 });
