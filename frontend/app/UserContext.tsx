@@ -2,13 +2,12 @@
 
 import { Dispatch, createContext, useContext, useReducer } from "react";
 
-interface User {
-  id: number;
+export interface User {
   username: string;
   email?: string;
 }
 
-type UserReducerPayload = { type: string; payload: null | User };
+export type UserReducerPayload = { type: string; payload: null | User };
 interface UserContextType {
   user: User | null;
   setUser: Dispatch<UserReducerPayload>;

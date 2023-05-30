@@ -1,55 +1,63 @@
+import { createUser, getUserByEmail, userAlreadyExists } from "../data/user";
 import { createJWT } from "../utils/auth";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 
-const prisma = new PrismaClient();
+type UserInputType = {
+  email: string;
+  password: string;
+  username: string;
+};
 
 export const handleLogin = async (req: Request, res: Response) => {
-  const data = req.body as { email: string; password: string };
-  if (!data?.email || !data?.password) {
-    res.status(400).json({ error: "Missing email or password" });
-  }
+  const data = req.body as Pick<UserInputType, "email" | "password">;
   const { email, password } = data;
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
-  if (!user) {
-    res.status(400).json({ error: "Invalid email or password" });
-    return;
+  try {
+    const user = await getUserByEmail(email);
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      res.status(400).json({ error: "Invalid email or password" });
+      return;
+    }
+    const token = createJWT(user);
+    res.cookie("token", token, {
+      httpOnly: true,
+    });
+    res.json({
+      message: "Logged in",
+      user: { name: user.name },
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error" });
   }
-  const passwordMatch = await bcrypt.compare(password, user.password);
-  if (!passwordMatch) {
-    res.status(400).json({ error: "Invalid email or password" });
-    return;
-  }
-  const token = createJWT(user);
-  res.cookie("token", token, {
-    httpOnly: true,
-  });
-  // TODO: send necessary user data to client
-  res.json({ message: "Logged in" });
 };
 
 export const handleRegister = async (req: Request, res: Response) => {
-  const data = req.body as { email: string; password: string };
-  if (!data || !data?.email || !data?.password) {
-    res.status(400).json({ error: "Missing email or password" });
-  }
-  const { email, password } = data;
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = await prisma.user.create({
-    data: {
+  try {
+    const data = req.body as UserInputType;
+    const { email, username, password } = data;
+    if (await userAlreadyExists(email, username)) {
+      res.status(400);
+      res.json({ error: "User already exists" });
+      return;
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await createUser({
       email,
+      username,
       password: hashedPassword,
-    },
-  });
-  const token = createJWT(user);
-  res.cookie("token", token, {
-    httpOnly: true,
-  });
-  // TODO: send necessary user data to client
-  res.json({ message: "User created" });
+    });
+    const userPayload = {
+      name: user.name,
+    };
+    const token = createJWT(user);
+    res.cookie("token", token, {
+      httpOnly: true,
+    });
+    res.json({ user: userPayload, message: "Logged in" });
+  } catch (err) {
+    res.status(500);
+    res.json({ error: "Internal server error" });
+  }
 };
 
 export const handleLogout = async (_req: Request, res: Response) => {
