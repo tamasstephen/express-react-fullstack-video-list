@@ -1,5 +1,5 @@
 import LogRegForm from "../components/LogRegForm";
 
 export default function Register() {
-  return <LogRegForm />;
+  return <LogRegForm submitType="register" />;
 }

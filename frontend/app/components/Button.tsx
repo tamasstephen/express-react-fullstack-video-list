@@ -3,6 +3,7 @@ import { ButtonHTMLAttributes, MouseEventHandler } from "react";
 type ButtonProps = {
   children: React.ReactNode;
   buttonType: "primary" | "secondary" | "primary-sm";
+  testProps?: string;
   attributes?: ButtonHTMLAttributes<HTMLButtonElement>;
   cb?: MouseEventHandler<HTMLButtonElement>;
 };
@@ -18,10 +19,12 @@ export default function Button({
   buttonType,
   attributes,
   cb,
+  testProps,
 }: ButtonProps) {
   return (
     <button
       className={`rounded-md  hover:-translate-y-[1px] transition-all duration-200 ease-in-out ${buttonTypeClasses[buttonType]}`}
+      data-cy={testProps}
       {...(cb ? { onClick: cb } : {})}
       {...attributes}
     >

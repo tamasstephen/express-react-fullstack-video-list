@@ -6,6 +6,7 @@ type InputProps = {
   htmlProps: InputHTMLAttributes<HTMLInputElement>;
   register: UseFormRegister<FieldValues>;
   isRequired: boolean;
+  testProps: string;
   validate?: { [key: string]: any };
 };
 
@@ -15,6 +16,7 @@ export default function Input({
   register,
   isRequired,
   validate,
+  testProps,
 }: InputProps) {
   return (
     <div className="flex flex-col w-72">
@@ -25,6 +27,7 @@ export default function Input({
         className="h-8 p-2 rounded-md border border-gray-400 w-full"
         {...htmlProps}
         {...register(label, { required: isRequired, ...validate })}
+        data-cy={testProps}
       />
     </div>
   );

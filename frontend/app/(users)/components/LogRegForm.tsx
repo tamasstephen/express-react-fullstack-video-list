@@ -4,17 +4,16 @@ import { usePathname, useRouter } from "next/navigation";
 import { useUserContext } from "@/app/UserContext";
 import Button from "@/app/components/Button";
 import Input from "./Input";
-import { useForm, FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import ErrorBar from "./ErrorBar";
 import { useState } from "react";
+import { submitForm } from "../utils";
 
-type FormBody = {
-  email: string;
-  password: string;
-  username?: string;
-};
-
-export default function LogRegForm() {
+export default function LogRegForm({
+  submitType,
+}: {
+  submitType: "login" | "register";
+}) {
   const { user, setUser } = useUserContext();
   const pathName = usePathname();
   const router = useRouter();
@@ -26,36 +25,6 @@ export default function LogRegForm() {
     formState: { errors },
   } = useForm();
 
-  async function submitForm(data: FieldValues) {
-    const bodyData: FormBody = {
-      email: data.email,
-      password: data.password,
-    };
-    if (pathName === "/register") {
-      bodyData["username"] = data.username;
-    }
-    const body = JSON.stringify(bodyData);
-    const res = await fetch(
-      `http://localhost:3001/${pathName.replace("/", "")}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body,
-      }
-    );
-    if (res.status === 200) {
-      const data = await res.json();
-      setUser({ type: "login", payload: { username: data.user.name } });
-      console.log(user);
-      router.push("/");
-    } else if (res.status === 401 || res.status === 400) {
-      const data = await res.json();
-      setResponseError(() => [data.error]);
-    }
-  }
-
   return (
     <div className="flex flex-col items-center justify-center w-72">
       <h1 className="text-4xl font-bold text-center tracking-tight mb-8 w-full">
@@ -63,13 +32,20 @@ export default function LogRegForm() {
       </h1>
       {responseError.length > 0 && <ErrorBar errors={responseError} />}
       <form
-        onSubmit={handleSubmit((data) => submitForm(data))}
+        onSubmit={handleSubmit((data) =>
+          submitForm(data, submitType, setUser, setResponseError, router)
+        )}
         className="grid gap-4 items-center justify-center w-full"
         action="post"
       >
         <Input
           label="email"
-          htmlProps={{ type: "email", id: "email", name: "email" }}
+          htmlProps={{
+            type: "email",
+            id: "email",
+            name: "email",
+          }}
+          testProps="email"
           isRequired={true}
           register={register}
           validate={{
@@ -85,6 +61,7 @@ export default function LogRegForm() {
             <Input
               label="username"
               htmlProps={{ type: "text", id: "username", name: "username" }}
+              testProps="username"
               isRequired={true}
               register={register}
               validate={{
@@ -104,6 +81,7 @@ export default function LogRegForm() {
         <Input
           label="password"
           htmlProps={{ type: "password", id: "password", name: "password" }}
+          testProps="password"
           isRequired={true}
           register={register}
           validate={{
@@ -118,7 +96,11 @@ export default function LogRegForm() {
             errors={["The password must be at least 8 characters long"]}
           />
         )}
-        <Button buttonType="primary" attributes={{ type: "submit" }}>
+        <Button
+          buttonType="primary"
+          attributes={{ type: "submit" }}
+          testProps="submit"
+        >
           Continue
         </Button>
       </form>
