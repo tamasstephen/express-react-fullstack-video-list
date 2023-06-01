@@ -1,11 +1,12 @@
 "use client";
 
 import { FieldValues, useForm } from "react-hook-form";
-import Input from "../components/Input";
+import { useSession } from "next-auth/react";
+import Input from "../components/form/Input";
 import Button from "@/app/components/Button";
-import ErrorBar from "../components/ErrorBar";
+import ErrorBar from "../components/form/ErrorBar";
 
-function submitFile(data: FieldValues) {
+async function submitFile(data: FieldValues) {
   const formData = new FormData();
   formData.append("video", data.video[0]);
   formData.append("title", data.title);
@@ -19,6 +20,9 @@ export default function Upload() {
     watch,
     formState: { errors },
   } = useForm();
+  const { data: session } = useSession({
+    required: true,
+  });
   return (
     <div>
       <h1>Upload</h1>

@@ -1,15 +1,16 @@
-import { useUserContext } from "@/app/UserContext";
 import { useClickOutSide } from "@/hooks/useClickOutside";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function UserWidget() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const myRef = useClickOutSide(() => setIsMenuOpen(false));
-  const { user, setUser } = useUserContext();
-  const userInitials = user?.username
-    .split(" ")
-    .map((name) => name[0])
+  const { data: session } = useSession();
+  const userInitials = session?.user?.name
+    ?.split(" ")
+    .map((name: string) => name[0])
     .join("");
   function handleClick() {
     setIsMenuOpen((prev) => !prev);
@@ -22,8 +23,9 @@ export default function UserWidget() {
         "Content-Type": "application/json",
       },
     });
-    const data = await res.json();
-    setUser({ type: "logout", payload: null });
+    if (res.ok) {
+      signOut();
+    }
   }
 
   return (
@@ -50,7 +52,6 @@ export default function UserWidget() {
               <button
                 onClick={() => {
                   handleLogout();
-                  setIsMenuOpen(false);
                 }}
               >
                 Logout
