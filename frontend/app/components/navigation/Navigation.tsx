@@ -1,7 +1,7 @@
 "use client";
 
 import Wrapper from "../Wrapper";
-import { useUserContext } from "../../UserContext";
+import { signIn, useSession } from "next-auth/react";
 import Button from "../Button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,8 +9,8 @@ import UserWidget from "./UserWidget";
 
 export default function Navigation() {
   const router = useRouter();
+  const { data: session } = useSession();
 
-  const { user } = useUserContext();
   return (
     <nav className="flex items-center justify-center flex-wrap border-b border-gray-300 p-4 w-full">
       <Wrapper>
@@ -33,18 +33,18 @@ export default function Navigation() {
               </svg>
             </button>
           </div>
-          {user ? (
+          {session?.user ? (
             <UserWidget />
           ) : (
             <div className="flex items-center">
-              <Link href="/login">
-                <p className="mr-8 text-sm font-medium text-gray-600">Login</p>
-              </Link>
+              <Button buttonType="link-sm" cb={() => signIn()}>
+                Login
+              </Button>
               <Button
                 buttonType="primary-sm"
                 cb={() => router.push("/register")}
               >
-                Register
+                Sign Up
               </Button>
             </div>
           )}

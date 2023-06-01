@@ -1,4 +1,4 @@
-import { UserContextPorvider } from "./UserContext";
+import SessionProviderWrapper from "./components/SessionProviderWrapper";
 import Navigation from "./components/navigation/Navigation";
 import "./globals.css";
 import { Inter } from "next/font/google";
@@ -18,10 +18,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className + " min-h-screen"}>
-        <UserContextPorvider>
+        <SessionProviderWrapper>
           <Navigation />
           {children}
-        </UserContextPorvider>
+        </SessionProviderWrapper>
       </body>
     </html>
   );

@@ -1,22 +1,12 @@
 "use client";
-
-import { usePathname, useRouter } from "next/navigation";
-import { useUserContext } from "@/app/UserContext";
 import Button from "@/app/components/Button";
-import Input from "./Input";
+import Input from "../../components/form/Input";
 import { useForm } from "react-hook-form";
-import ErrorBar from "./ErrorBar";
+import ErrorBar from "../../components/form/ErrorBar";
 import { useState } from "react";
-import { submitForm } from "../utils";
+import { signIn } from "next-auth/react";
 
-export default function LogRegForm({
-  submitType,
-}: {
-  submitType: "login" | "register";
-}) {
-  const { user, setUser } = useUserContext();
-  const pathName = usePathname();
-  const router = useRouter();
+export default function Login() {
   const [responseError, setResponseError] = useState<string[]>([]);
   const {
     register,
@@ -28,12 +18,15 @@ export default function LogRegForm({
   return (
     <div className="flex flex-col items-center justify-center w-72">
       <h1 className="text-4xl font-bold text-center tracking-tight mb-8 w-full">
-        {pathName === "/register" ? "Register to Vidia" : "Log in to Vidia"}
+        Sign in to Vidia
       </h1>
       {responseError.length > 0 && <ErrorBar errors={responseError} />}
       <form
         onSubmit={handleSubmit((data) =>
-          submitForm(data, submitType, setUser, setResponseError, router)
+          signIn("credentials", {
+            ...data,
+            callbackUrl: `/`,
+          })
         )}
         className="grid gap-4 items-center justify-center w-full"
         action="post"
@@ -56,28 +49,6 @@ export default function LogRegForm({
           }}
         />
         {errors.email && <ErrorBar errors={["Invalid email address"]} />}
-        {pathName === "/register" && (
-          <>
-            <Input
-              label="username"
-              htmlProps={{ type: "text", id: "username", name: "username" }}
-              testProps="username"
-              isRequired={true}
-              register={register}
-              validate={{
-                minLength: {
-                  value: 3,
-                  message: "Password must be at least 8 characters long",
-                },
-              }}
-            />
-            {errors.username && (
-              <ErrorBar
-                errors={["The username must be at least 3 characters long"]}
-              />
-            )}
-          </>
-        )}
         <Input
           label="password"
           htmlProps={{ type: "password", id: "password", name: "password" }}
