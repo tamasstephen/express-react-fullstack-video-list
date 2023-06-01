@@ -37,14 +37,14 @@ export default function Navigation() {
             <UserWidget />
           ) : (
             <div className="flex items-center">
-              <Button buttonType="secondary" cb={() => signIn()}>
-                <p className="mr-8 text-sm font-medium text-gray-600">Login</p>
+              <Button buttonType="link-sm" cb={() => signIn()}>
+                Login
               </Button>
               <Button
                 buttonType="primary-sm"
                 cb={() => router.push("/register")}
               >
-                Register
+                Sign Up
               </Button>
             </div>
           )}

@@ -54,8 +54,8 @@ export default function Register() {
 
   return (
     <div className="flex flex-col items-center justify-center w-72">
-      <h1 className="text-4xl font-bold text-center tracking-tight mb-8 w-full">
-        Register to Vidia
+      <h1 className="text-4xl font-bold text-center tracking-tighter mb-8 w-full">
+        Create your Vidia account
       </h1>
       {responseError.length > 0 && <ErrorBar errors={responseError} />}
       <form
