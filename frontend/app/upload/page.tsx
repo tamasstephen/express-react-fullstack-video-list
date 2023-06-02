@@ -5,6 +5,8 @@ import { useSession } from "next-auth/react";
 import Input from "../components/form/Input";
 import Button from "@/app/components/Button";
 import ErrorBar from "../components/form/ErrorBar";
+import Heading from "../components/Heading";
+import Div from "../components/Div";
 
 async function submitFile(data: FieldValues) {
   const formData = new FormData();
@@ -24,45 +26,49 @@ export default function Upload() {
     required: true,
   });
   return (
-    <div>
-      <h1>Upload</h1>
-      <form onSubmit={handleSubmit((data) => console.log(data))}>
-        <Input
-          label="title"
-          htmlProps={{ type: "text", id: "title", name: "title" }}
-          testProps="title"
-          isRequired={true}
-          register={register}
-        />
-        {errors.title && (
-          <ErrorBar errors={["Please provide a title for the video"]} />
-        )}
-        <div className="flex flex-col w-72">
-          <label htmlFor="description">Description</label>
-          <textarea
-            id="description"
-            {...register("description", { required: true })}
+    <main className="flex flex-col h-full items-center justify-center min-h-[75vh] mx-4 pt-8 lg:mx-0">
+      <Div>
+        <Heading>Upload</Heading>
+        <form onSubmit={handleSubmit((data) => console.log(data))}>
+          <Input
+            label="title"
+            htmlProps={{ type: "text", id: "title", name: "title" }}
+            testProps="title"
+            isRequired={true}
+            register={register}
           />
-        </div>
-        {errors.description && (
-          <ErrorBar errors={["Please provide a description for the video"]} />
-        )}
-        <Input
-          label="video"
-          htmlProps={{ type: "file", id: "video", name: "video" }}
-          testProps="vieo"
-          isRequired={true}
-          register={register}
-        />
-        {errors.video && <ErrorBar errors={["Please provide a video file"]} />}
-        <Button
-          buttonType="primary"
-          attributes={{ type: "submit" }}
-          testProps="submit"
-        >
-          Upload
-        </Button>
-      </form>
-    </div>
+          {errors.title && (
+            <ErrorBar errors={["Please provide a title for the video"]} />
+          )}
+          <div className="flex flex-col w-72">
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              {...register("description", { required: true })}
+            />
+          </div>
+          {errors.description && (
+            <ErrorBar errors={["Please provide a description for the video"]} />
+          )}
+          <Input
+            label="video"
+            htmlProps={{ type: "file", id: "video", name: "video" }}
+            testProps="vieo"
+            isRequired={true}
+            register={register}
+          />
+          {errors.video && (
+            <ErrorBar errors={["Please provide a video file"]} />
+          )}
+          <Button
+            buttonType="primary"
+            attributes={{ type: "submit" }}
+            testProps="submit"
+          >
+            Upload
+          </Button>
+        </form>
+      </Div>
+    </main>
   );
 }
