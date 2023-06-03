@@ -1,6 +1,5 @@
-import type { IJwtRequest } from "../../utils/auth";
 import { createJWT, protectRoute } from "../../utils/auth";
-import type { Response } from "express";
+import type { Response, Request } from "express";
 import jwt from "jsonwebtoken";
 
 jest.mock("jsonwebtoken", () => ({
@@ -53,9 +52,9 @@ describe("createJWT", () => {
 });
 
 describe("protectRoute", () => {
-  const mockRequest: Partial<IJwtRequest> = {
-    cookies: {
-      token: "valid-token",
+  const mockRequest: Partial<Request> = {
+    headers: {
+      authorization: "Bearer valid-token",
     },
   };
   const mockResponse: Partial<Response> = {
@@ -69,11 +68,7 @@ describe("protectRoute", () => {
   });
 
   test("should grant access if a valid token is provided", () => {
-    protectRoute(
-      mockRequest as IJwtRequest,
-      mockResponse as Response,
-      mockNext
-    );
+    protectRoute(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(mockNext).toHaveBeenCalled();
     expect(mockResponse.status).not.toHaveBeenCalled();
@@ -81,12 +76,12 @@ describe("protectRoute", () => {
   });
 
   test("should deny access if no token is provided", () => {
-    const requestWithoutToken: Partial<IJwtRequest> = {
-      cookies: {},
+    const requestWithoutToken: Partial<Request> = {
+      headers: {},
     };
 
     protectRoute(
-      requestWithoutToken as IJwtRequest,
+      requestWithoutToken as Request,
       mockResponse as Response,
       mockNext
     );
@@ -97,14 +92,14 @@ describe("protectRoute", () => {
   });
 
   test("should deny access if an invalid token is provided", () => {
-    const requestWithInvalidToken: Partial<IJwtRequest> = {
-      cookies: {
-        token: "invalid-token",
+    const requestWithInvalidToken: Partial<Request> = {
+      headers: {
+        authorization: "Bearer invalid-token",
       },
     };
 
     protectRoute(
-      requestWithInvalidToken as IJwtRequest,
+      requestWithInvalidToken as Request,
       mockResponse as Response,
       mockNext
     );
@@ -115,10 +110,10 @@ describe("protectRoute", () => {
   });
 
   test("should handle missing cookies property in the request", () => {
-    const requestWithoutCookies: Partial<IJwtRequest> = {};
+    const requestWithoutCookies: Partial<Request> = {};
 
     protectRoute(
-      requestWithoutCookies as IJwtRequest,
+      requestWithoutCookies as Request,
       mockResponse as Response,
       mockNext
     );

@@ -2,10 +2,6 @@ import type { User } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-export interface IJwtRequest extends Request {
-  cookies: { token?: string };
-}
-
 export const createJWT = ({ id, name }: Pick<User, "name" | "id">) => {
   const payload = {
     id,
@@ -16,11 +12,11 @@ export const createJWT = ({ id, name }: Pick<User, "name" | "id">) => {
 };
 
 export const protectRoute = (
-  req: IJwtRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const rawBearerToken = req.headers.authorization;
+  const rawBearerToken = req?.headers?.authorization;
   const authToken = rawBearerToken?.split(" ")[1];
   if (authToken) {
     try {
