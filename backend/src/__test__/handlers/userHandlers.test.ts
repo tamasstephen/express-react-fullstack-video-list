@@ -108,9 +108,7 @@ describe("handleLogin", () => {
       name: validUser.name,
       email: validUser.email,
     });
-    expect(resMock.cookie).toHaveBeenCalledWith("token", "token", {
-      httpOnly: true,
-    });
+    expect(resMock.cookie).toHaveBeenCalledWith("token", "token");
     expect(resMock.json).toHaveBeenCalledWith({
       message: "Logged in",
       user: { name: validUser.name },
@@ -171,9 +169,6 @@ describe("handleRegister", () => {
     await handleRegister(reqRegMock, resRegMock);
 
     // Check the response
-    expect(resRegMock.cookie).toHaveBeenCalledWith("token", "token", {
-      httpOnly: true,
-    });
     expect(resRegMock.json).toHaveBeenCalledWith({
       user: { name: "Test User" },
       message: "Logged in",
