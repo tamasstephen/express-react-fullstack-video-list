@@ -18,13 +18,14 @@ export default function Input({
   validate,
   testProps,
 }: InputProps) {
+  const fileUploadStyle = htmlProps?.type === "file" ? "min-h-[2.5rem]" : "";
   return (
     <div className="flex flex-col w-72">
       <label className="text-sm mb-1 capitalize" htmlFor="email">
         {label}
       </label>
       <input
-        className="h-8 p-2 rounded-md border border-gray-400 w-full"
+        className={`h-8 p-2 rounded-md border border-gray-400 w-full ${fileUploadStyle}`}
         {...htmlProps}
         {...register(label, { required: isRequired, ...validate })}
         data-cy={testProps}

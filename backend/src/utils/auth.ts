@@ -20,7 +20,8 @@ export const protectRoute = (
   res: Response,
   next: NextFunction
 ) => {
-  const authToken = req.cookies?.token;
+  const rawBearerToken = req.headers.authorization;
+  const authToken = rawBearerToken?.split(" ")[1];
   if (authToken) {
     try {
       const token = jwt.verify(authToken, process.env.JWT_SECRET as string);

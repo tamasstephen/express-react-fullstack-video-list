@@ -19,9 +19,7 @@ export const handleLogin = async (req: Request, res: Response) => {
       return;
     }
     const token = createJWT(user);
-    res.cookie("token", token, {
-      httpOnly: true,
-    });
+    res.cookie("token", token);
     res.json({
       message: "Logged in",
       user: { name: user.name },
@@ -49,10 +47,6 @@ export const handleRegister = async (req: Request, res: Response) => {
     const userPayload = {
       name: user.name,
     };
-    const token = createJWT(user);
-    res.cookie("token", token, {
-      httpOnly: true,
-    });
     res.json({ user: userPayload, message: "Logged in" });
   } catch (err) {
     res.status(500);
