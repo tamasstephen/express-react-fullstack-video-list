@@ -1,10 +1,14 @@
-import { createUser, getUserByEmail, userAlreadyExists } from "../../data/user";
+import {
+  createUser,
+  getUserByEmail,
+  userAlreadyExists,
+} from "../../../data/user";
 import {
   handleLogin,
   handleLogout,
   handleRegister,
-} from "../../handlers/userHandler";
-import { createJWT } from "../../utils/auth"; // Import the necessary helper functions
+} from "../../../handlers/userHandler";
+import { createJWT } from "../../../utils/auth"; // Import the necessary helper functions
 import bcrypt from "bcrypt";
 import type { Request, Response } from "express";
 
@@ -34,12 +38,12 @@ const resRegMock = {
 } as unknown as Response;
 
 // Mock the jwt token creation function
-jest.mock("../../utils/auth", () => ({
+jest.mock("../../../utils/auth", () => ({
   createJWT: jest.fn((data: { id: string; name: string }) => "token"),
 }));
 
 // Mock the user data functions
-jest.mock("../../data/user", () => ({
+jest.mock("../../../data/user", () => ({
   getUserByEmail: jest.fn((email: string) => ({
     id: "1",
     name: "John Doe",
