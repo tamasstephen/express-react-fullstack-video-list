@@ -25,3 +25,12 @@ export const createVideo = async ({
   });
   return video;
 };
+
+export const getVideoById = async (id: string) => {
+  const video = await prisma.video.findUnique({
+    where: {
+      id,
+    },
+  });
+  return video;
+};
