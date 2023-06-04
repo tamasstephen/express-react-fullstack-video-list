@@ -2,7 +2,9 @@ import type { User } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-export const createJWT = ({ id, name }: Pick<User, "name" | "id">) => {
+type Token = Pick<User, "name" | "id">;
+
+export const createJWT = ({ id, name }: Token) => {
   const payload = {
     id,
     name,
@@ -16,8 +18,7 @@ export const protectRoute = (
   res: Response,
   next: NextFunction
 ) => {
-  const rawBearerToken = req?.headers?.authorization;
-  const authToken = rawBearerToken?.split(" ")[1];
+  const authToken = getBearerToken(req);
   if (authToken) {
     try {
       const token = jwt.verify(authToken, process.env.JWT_SECRET as string);
@@ -29,4 +30,22 @@ export const protectRoute = (
   }
   res.status(401).json({ error: "Not authorized" });
   return;
+};
+
+export const decodeJWT = (token: string) => {
+  try {
+    const decodedToken = jwt.verify(
+      token,
+      process.env.JWT_SECRET as string
+    ) as Token;
+    return decodedToken;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const getBearerToken = (req: Request) => {
+  const rawBearerToken = req?.headers?.authorization;
+  const authToken = rawBearerToken?.split(" ")[1];
+  return authToken;
 };
