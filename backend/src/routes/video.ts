@@ -11,12 +11,10 @@ videoRouter.post(
   protectRoute,
   videoUpload.single("video"),
   (req: VideoRequest, res) => {
-    console.log("The body in the video route is: ", req.body);
     if (req.body?.error) {
       return res.status(500).json(req.body.error);
     }
     saveVideo(req, res);
-    res.json("Hello video route!");
   }
 );
 

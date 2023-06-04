@@ -9,24 +9,19 @@ export const createVideo = async ({
   originalFileName,
   userId,
 }: VideoParam) => {
-  try {
-    const video = await prisma.video.create({
-      data: {
-        title,
-        description,
-        path,
-        fileName,
-        originalFileName,
-        user: {
-          connect: {
-            id: userId,
-          },
+  const video = await prisma.video.create({
+    data: {
+      title,
+      description,
+      path,
+      fileName,
+      originalFileName,
+      user: {
+        connect: {
+          id: userId,
         },
       },
-    });
-    return video;
-  } catch (err) {
-    console.log(err);
-    return null;
-  }
+    },
+  });
+  return video;
 };
