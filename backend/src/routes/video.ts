@@ -1,23 +1,29 @@
+import { saveVideo } from "../handlers/videoHandler";
+import { videoUpload } from "../middlewares/video.middleware";
+import type { VideoRequest } from "../types";
 import { protectRoute } from "../utils/auth";
 import { Router } from "express";
-import multer from "multer";
-import path from "path";
 
 export const videoRouter = Router();
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => {
-    cb(null, "./video");
-  },
-  filename: (_req, file, cb) => {
-    console.log(file);
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
+
+videoRouter.post(
+  "/video",
+  protectRoute,
+  videoUpload.single("video"),
+  (req: VideoRequest, res) => {
+    console.log("The body in the video route is: ", req.body);
+    if (req.body?.error) {
+      return res.status(500).json(req.body.error);
+    }
+    saveVideo(req, res);
+    res.json("Hello video route!");
+  }
+);
+
+videoRouter.get("/video", (_req, res) => {
+  res.json("Hello video route!");
 });
 
-const upload = multer({ storage });
-
-videoRouter.post("/video", protectRoute, upload.single("video"), (req, res) => {
-  console.log("The body is: ", req.body);
-  console.log("The file is: ", req.file);
+videoRouter.get("/video/:id", (_req, res) => {
   res.json("Hello video route!");
 });
