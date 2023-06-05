@@ -1,4 +1,4 @@
-import { saveVideo, streamVideo } from "../handlers/videoHandler";
+import { getVideoData, saveVideo, streamVideo } from "../handlers/videoHandler";
 import { videoUpload } from "../middlewares/video.middleware";
 import type { VideoRequest } from "../types";
 import { protectRoute } from "../utils/auth";
@@ -25,4 +25,9 @@ videoRouter.get("/video", (_req, res) => {
 videoRouter.get("/video/:id", (req, res) => {
   const id = req.params.id;
   streamVideo(id, req, res);
+});
+
+videoRouter.get("/video/:id/data", (req, res) => {
+  const id = req.params.id;
+  getVideoData(id, req, res);
 });
