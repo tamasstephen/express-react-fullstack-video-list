@@ -1,5 +1,10 @@
-import { createJWT, protectRoute } from "../../utils/auth";
-import type { Response, Request } from "express";
+import {
+  createJWT,
+  decodeJWT,
+  getBearerToken,
+  protectRoute,
+} from "../../utils/auth";
+import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 jest.mock("jsonwebtoken", () => ({
@@ -121,5 +126,51 @@ describe("protectRoute", () => {
     expect(mockNext).not.toHaveBeenCalled();
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: "Not authorized" });
+  });
+});
+
+describe("getBearerToken", () => {
+  const bearerToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNhOGZiYmE1LWZiZGMtNGMyYy04MWVjLTIxNzY3MTgyMTgzMiIsIm5hbWUiOiJ3b3ciLCJpYXQiOjE2ODU4Njc3NzB9.dPctPvKIMqyvDGihUbVBQCR0ytHwZde615CI5CM4xDM";
+  it("should return the bearer token from the request headers", () => {
+    const req = {
+      headers: {
+        authorization: `Bearer ${bearerToken}`,
+      },
+    } as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBe(bearerToken);
+  });
+
+  it("should return undefined if the authorization header is missing", () => {
+    const req = {} as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBeUndefined();
+  });
+
+  it("should return undefined if the bearer token is missing", () => {
+    const req = {
+      headers: {
+        authorization: "Bearer",
+      },
+    } as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBeUndefined();
+  });
+
+  it("should return undefined if the request is undefined", () => {
+    const req = {
+      headers: {},
+    } as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBeUndefined();
   });
 });
