@@ -33,7 +33,6 @@ export const saveVideo = async (req: VideoRequest, res: Response) => {
       return video;
     }
   } catch (err) {
-    console.log(err);
     return res.status(500).json({ error: err });
   }
 };
