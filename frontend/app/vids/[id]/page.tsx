@@ -6,6 +6,13 @@ import Video from "./component/video";
 import VideoDetails from "./component/VideoDetails";
 import Div from "@/app/components/Div";
 
+function getUserInitials(name: string) {
+  return name
+    .split(" ")
+    .map((name) => name.charAt(0))
+    .join("");
+}
+
 export default function SingleVideoPage() {
   const pathName = usePathname();
   const videoId = pathName.split("/")[2];
@@ -16,7 +23,6 @@ export default function SingleVideoPage() {
         res.json()
       )
   );
-  console.log(data);
   return (
     <div className="mt-8 mb-24">
       <Div width="large">
@@ -29,7 +35,10 @@ export default function SingleVideoPage() {
           <VideoDetails
             title={data.title}
             description={data.description}
-            user={data.user.name}
+            user={{
+              initials: getUserInitials(data.user.name),
+              name: data.user.name,
+            }}
           />
         )}
       </Div>
