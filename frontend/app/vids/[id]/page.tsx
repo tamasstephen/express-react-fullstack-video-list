@@ -2,8 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useQuery } from "react-query";
-import Video from "./component/video";
-import VideoDetails from "./component/VideoDetails";
+import Video from "@/app/components/video/video";
+import VideoDetails from "@/app/components/video/VideoDetails";
 import Div from "@/app/components/Div";
 
 function getUserInitials(name: string) {
@@ -30,7 +30,7 @@ export default function SingleVideoPage() {
         {isLoading ? (
           <p>Loading...</p>
         ) : isError ? (
-          <p>Error: {error}</p>
+          <p>Error: {error as string}</p>
         ) : (
           <VideoDetails
             title={data.title}

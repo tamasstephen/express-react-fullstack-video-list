@@ -82,6 +82,7 @@ export const getVideoData = async (id: string, req: Request, res: Response) => {
       user: {
         name: video.user.name,
       },
+      likes: video.likes.length,
     });
   } else {
     res.sendStatus(404);

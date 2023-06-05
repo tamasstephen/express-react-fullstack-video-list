@@ -33,6 +33,7 @@ export const getVideoById = async (id: string) => {
     },
     include: {
       user: true,
+      likes: true,
     },
   });
   return video;
