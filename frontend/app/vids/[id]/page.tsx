@@ -16,8 +16,9 @@ export default function SingleVideoPage() {
         res.json()
       )
   );
+  console.log(data);
   return (
-    <div className="mt-8">
+    <div className="mt-8 mb-24">
       <Div width="large">
         <Video videoId={videoId} />
         {isLoading ? (
@@ -25,7 +26,11 @@ export default function SingleVideoPage() {
         ) : isError ? (
           <p>Error: {error}</p>
         ) : (
-          <VideoDetails title={data.title} description={data.description} />
+          <VideoDetails
+            title={data.title}
+            description={data.description}
+            user={data.user.name}
+          />
         )}
       </Div>
     </div>

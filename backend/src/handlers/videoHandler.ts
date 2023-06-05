@@ -71,6 +71,7 @@ export const streamVideo = async (id: string, req: Request, res: Response) => {
 
 export const getVideoData = async (id: string, req: Request, res: Response) => {
   const video = await getVideoById(id);
+  console.log(video);
   if (video) {
     res.json({
       id: video.id,
@@ -78,6 +79,9 @@ export const getVideoData = async (id: string, req: Request, res: Response) => {
       description: video.description,
       originalFileName: video.originalFileName,
       createdAt: video.createdAt,
+      user: {
+        name: video.user.name,
+      },
     });
   } else {
     res.sendStatus(404);

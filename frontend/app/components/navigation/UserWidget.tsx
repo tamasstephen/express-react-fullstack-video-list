@@ -3,6 +3,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import UserIcon from "./UserIcon";
 
 export default function UserWidget() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,11 +31,8 @@ export default function UserWidget() {
 
   return (
     <div className="relative">
-      <button
-        className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 text-gray-900 font-medium"
-        onClick={handleClick}
-      >
-        {userInitials}
+      <button onClick={handleClick}>
+        <UserIcon initials={userInitials ?? ""} size="small" />
       </button>
       {isMenuOpen && (
         <div

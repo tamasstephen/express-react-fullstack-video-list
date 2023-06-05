@@ -31,6 +31,9 @@ export const getVideoById = async (id: string) => {
     where: {
       id,
     },
+    include: {
+      user: true,
+    },
   });
   return video;
 };

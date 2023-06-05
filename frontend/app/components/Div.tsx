@@ -6,7 +6,7 @@ interface DivProps {
 const widthMap = {
   small: "w-72",
   medium: "w-[90%] lg:w-1/2 max-w-5xl",
-  large: "w-[90%] lg:w-9/12 max-w-7xl",
+  large: "w-[90%] lg:w-7/12 max-w-7xl",
 };
 
 export default function Div({ children, width }: DivProps) {
