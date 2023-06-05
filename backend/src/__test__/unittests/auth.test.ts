@@ -164,7 +164,7 @@ describe("getBearerToken", () => {
     expect(authToken).toBeUndefined();
   });
 
-  it("should return undefined if the request is undefined", () => {
+  it("should return undefined if headers are missing", () => {
     const req = {
       headers: {},
     } as Request;
@@ -172,5 +172,36 @@ describe("getBearerToken", () => {
     const authToken = getBearerToken(req);
 
     expect(authToken).toBeUndefined();
+  });
+});
+
+describe("decodeJWT", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should decode and return the decoded token if verification is successful", () => {
+    const mockDecodedToken = { id: "user-id", name: "user-name" };
+    const mockToken = "your-token";
+
+    (jwt.verify as jest.Mock).mockReturnValueOnce(mockDecodedToken);
+
+    const decodedToken = decodeJWT(mockToken);
+
+    expect(jwt.verify).toHaveBeenCalledWith(mockToken, expect.any(String));
+    expect(decodedToken).toBe(mockDecodedToken);
+  });
+
+  it("should return null if verification throws an error", () => {
+    const mockToken = "your-token";
+
+    (jwt.verify as jest.Mock).mockImplementationOnce(() => {
+      throw new Error("Verification failed");
+    });
+
+    const decodedToken = decodeJWT(mockToken);
+
+    expect(jwt.verify).toHaveBeenCalledWith(mockToken, expect.any(String));
+    expect(decodedToken).toBeNull();
   });
 });
