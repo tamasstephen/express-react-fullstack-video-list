@@ -1,7 +1,8 @@
-import { saveVideo } from "../../../handlers/videoHandler";
-import type { Response } from "express";
+import { saveVideo, streamVideo } from "../../../handlers/videoHandler";
+import type { Request, Response } from "express";
 import { getBearerToken, decodeJWT } from "../../../utils/auth";
-import { createVideo } from "../../../data/video";
+import { createVideo, getVideoById } from "../../../data/video";
+import fs from "fs";
 
 jest.mock("../../../utils/auth.ts", () => ({
   getBearerToken: jest.fn(),
@@ -11,6 +12,12 @@ jest.mock("../../../utils/auth.ts", () => ({
 
 jest.mock("../../../data/video.ts", () => ({
   createVideo: jest.fn(),
+  getVideoById: jest.fn(),
+}));
+
+jest.mock("fs", () => ({
+  statSync: jest.fn(),
+  createReadStream: jest.fn(),
 }));
 
 describe("saveVideo", () => {
@@ -85,5 +92,84 @@ describe("saveVideo", () => {
 
     expect(mockRes.status).toHaveBeenCalledWith(500);
     expect(mockRes.json).toHaveBeenCalledWith({ error: mockError });
+  });
+});
+
+describe("streamVideo", () => {
+  let mockReq: any;
+  let mockRes: any;
+  let mockReturnStream: any;
+
+  beforeEach(() => {
+    mockReq = {
+      headers: {},
+    };
+
+    mockRes = {
+      writeHead: jest.fn(),
+      sendStatus: jest.fn(),
+      pipe: jest.fn(),
+    };
+
+    mockReturnStream = {
+      pipe: jest.fn(),
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should stream the video content when the video exists and range header is provided", async () => {
+    const mockVideo = { id: "video-id", path: "/path/to/video.mp4" };
+    const mockRange = "bytes=0-100";
+
+    (getVideoById as jest.Mock).mockResolvedValueOnce(mockVideo);
+    (fs.statSync as jest.Mock).mockReturnValueOnce({ size: 200 });
+    (fs.createReadStream as jest.Mock).mockReturnValueOnce(mockReturnStream);
+
+    mockReq.headers.range = mockRange;
+
+    await streamVideo(mockVideo.id, mockReq, mockRes);
+
+    expect(mockRes.writeHead).toHaveBeenCalledWith(206, {
+      "Content-Range": "bytes 0-100/200",
+      "Accept-Ranges": "bytes",
+      "Content-Length": 101,
+      "Content-Type": "video/mp4",
+    });
+    expect(fs.createReadStream).toHaveBeenCalledWith(mockVideo.path, {
+      start: 0,
+      end: 100,
+    });
+    expect(mockReturnStream.pipe).toHaveBeenCalled();
+  });
+
+  it("should stream the entire video when the video exists and range header is not provided", async () => {
+    const mockVideo = { id: "video-id", path: "/path/to/video.mp4" };
+    const mockSize = 200;
+
+    (getVideoById as jest.Mock).mockResolvedValueOnce(mockVideo);
+    (fs.statSync as jest.Mock).mockReturnValueOnce({ size: mockSize });
+    (fs.createReadStream as jest.Mock).mockReturnValueOnce(mockReturnStream);
+
+    await streamVideo(mockVideo.id, mockReq, mockRes);
+
+    expect(mockRes.writeHead).toHaveBeenCalledWith(200, {
+      "Content-Length": mockSize,
+      "Content-Type": "video/mp4",
+    });
+    expect(fs.createReadStream).toHaveBeenCalledWith(mockVideo.path);
+    expect(mockReturnStream.pipe).toHaveBeenCalled();
+  });
+
+  it("should send a 404 status when the video does not exist", async () => {
+    const mockVideoId = "non-existent-video-id";
+
+    (getVideoById as jest.Mock).mockResolvedValueOnce(null);
+
+    await streamVideo(mockVideoId, mockReq, mockRes);
+
+    expect(mockRes.sendStatus).toHaveBeenCalledWith(404);
   });
 });
