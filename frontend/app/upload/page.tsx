@@ -78,7 +78,12 @@ export default function Upload() {
           )}
           <Input
             label="video"
-            htmlProps={{ type: "file", id: "video", name: "video" }}
+            htmlProps={{
+              type: "file",
+              id: "video",
+              name: "video",
+              accept: "video/mp4",
+            }}
             testProps="vieo"
             isRequired={true}
             register={register}
