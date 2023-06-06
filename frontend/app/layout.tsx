@@ -1,6 +1,8 @@
+import ReactQueryWrapper from "./components/ReactQueryWrapper";
 import SessionProviderWrapper from "./components/SessionProviderWrapper";
 import Navigation from "./components/navigation/Navigation";
 import "./globals.css";
+
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,8 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className + " min-h-screen"}>
         <SessionProviderWrapper>
-          <Navigation />
-          {children}
+          <ReactQueryWrapper>
+            <Navigation />
+            {children}
+          </ReactQueryWrapper>
         </SessionProviderWrapper>
       </body>
     </html>

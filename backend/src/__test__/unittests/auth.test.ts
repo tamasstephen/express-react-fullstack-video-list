@@ -1,6 +1,10 @@
-import type { IJwtRequest } from "../../utils/auth";
-import { createJWT, protectRoute } from "../../utils/auth";
-import type { Response } from "express";
+import {
+  createJWT,
+  decodeJWT,
+  getBearerToken,
+  protectRoute,
+} from "../../utils/auth";
+import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 jest.mock("jsonwebtoken", () => ({
@@ -53,9 +57,9 @@ describe("createJWT", () => {
 });
 
 describe("protectRoute", () => {
-  const mockRequest: Partial<IJwtRequest> = {
-    cookies: {
-      token: "valid-token",
+  const mockRequest: Partial<Request> = {
+    headers: {
+      authorization: "Bearer valid-token",
     },
   };
   const mockResponse: Partial<Response> = {
@@ -69,11 +73,7 @@ describe("protectRoute", () => {
   });
 
   test("should grant access if a valid token is provided", () => {
-    protectRoute(
-      mockRequest as IJwtRequest,
-      mockResponse as Response,
-      mockNext
-    );
+    protectRoute(mockRequest as Request, mockResponse as Response, mockNext);
 
     expect(mockNext).toHaveBeenCalled();
     expect(mockResponse.status).not.toHaveBeenCalled();
@@ -81,12 +81,12 @@ describe("protectRoute", () => {
   });
 
   test("should deny access if no token is provided", () => {
-    const requestWithoutToken: Partial<IJwtRequest> = {
-      cookies: {},
+    const requestWithoutToken: Partial<Request> = {
+      headers: {},
     };
 
     protectRoute(
-      requestWithoutToken as IJwtRequest,
+      requestWithoutToken as Request,
       mockResponse as Response,
       mockNext
     );
@@ -97,14 +97,14 @@ describe("protectRoute", () => {
   });
 
   test("should deny access if an invalid token is provided", () => {
-    const requestWithInvalidToken: Partial<IJwtRequest> = {
-      cookies: {
-        token: "invalid-token",
+    const requestWithInvalidToken: Partial<Request> = {
+      headers: {
+        authorization: "Bearer invalid-token",
       },
     };
 
     protectRoute(
-      requestWithInvalidToken as IJwtRequest,
+      requestWithInvalidToken as Request,
       mockResponse as Response,
       mockNext
     );
@@ -115,10 +115,10 @@ describe("protectRoute", () => {
   });
 
   test("should handle missing cookies property in the request", () => {
-    const requestWithoutCookies: Partial<IJwtRequest> = {};
+    const requestWithoutCookies: Partial<Request> = {};
 
     protectRoute(
-      requestWithoutCookies as IJwtRequest,
+      requestWithoutCookies as Request,
       mockResponse as Response,
       mockNext
     );
@@ -126,5 +126,82 @@ describe("protectRoute", () => {
     expect(mockNext).not.toHaveBeenCalled();
     expect(mockResponse.status).toHaveBeenCalledWith(401);
     expect(mockResponse.json).toHaveBeenCalledWith({ error: "Not authorized" });
+  });
+});
+
+describe("getBearerToken", () => {
+  const bearerToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNhOGZiYmE1LWZiZGMtNGMyYy04MWVjLTIxNzY3MTgyMTgzMiIsIm5hbWUiOiJ3b3ciLCJpYXQiOjE2ODU4Njc3NzB9.dPctPvKIMqyvDGihUbVBQCR0ytHwZde615CI5CM4xDM";
+  it("should return the bearer token from the request headers", () => {
+    const req = {
+      headers: {
+        authorization: `Bearer ${bearerToken}`,
+      },
+    } as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBe(bearerToken);
+  });
+
+  it("should return undefined if the authorization header is missing", () => {
+    const req = {} as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBeUndefined();
+  });
+
+  it("should return undefined if the bearer token is missing", () => {
+    const req = {
+      headers: {
+        authorization: "Bearer",
+      },
+    } as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBeUndefined();
+  });
+
+  it("should return undefined if headers are missing", () => {
+    const req = {
+      headers: {},
+    } as Request;
+
+    const authToken = getBearerToken(req);
+
+    expect(authToken).toBeUndefined();
+  });
+});
+
+describe("decodeJWT", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should decode and return the decoded token if verification is successful", () => {
+    const mockDecodedToken = { id: "user-id", name: "user-name" };
+    const mockToken = "your-token";
+
+    (jwt.verify as jest.Mock).mockReturnValueOnce(mockDecodedToken);
+
+    const decodedToken = decodeJWT(mockToken);
+
+    expect(jwt.verify).toHaveBeenCalledWith(mockToken, expect.any(String));
+    expect(decodedToken).toBe(mockDecodedToken);
+  });
+
+  it("should return null if verification throws an error", () => {
+    const mockToken = "your-token";
+
+    (jwt.verify as jest.Mock).mockImplementationOnce(() => {
+      throw new Error("Verification failed");
+    });
+
+    const decodedToken = decodeJWT(mockToken);
+
+    expect(jwt.verify).toHaveBeenCalledWith(mockToken, expect.any(String));
+    expect(decodedToken).toBeNull();
   });
 });

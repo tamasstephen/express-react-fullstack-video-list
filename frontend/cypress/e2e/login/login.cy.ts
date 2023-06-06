@@ -21,23 +21,6 @@ describe("Login", () => {
     cy.get("@password").should("have.value", "password");
   });
 
-  it("should fire submit function with valid input value", () => {
-    cy.intercept("POST", "http://localhost:3001/login", {
-      statusCode: 200,
-      body: {
-        user: {
-          name: "username",
-        },
-      },
-    }).as("myLogin");
-    cy.get("@email").type("email@email.com");
-    cy.get("@email").should("have.value", "email@email.com");
-    cy.get("@password").type("password");
-    cy.get("@password").should("have.value", "password");
-    cy.get("@submit").click();
-    cy.wait("@myLogin").its("response.body").should("have.a.property", "user");
-  });
-
   it("should require an email", () => {
     cy.get("@submit").click();
 

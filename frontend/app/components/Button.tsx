@@ -12,7 +12,7 @@ const buttonTypeClasses = {
   primary:
     "bg-slate-900 text-white p-2 font-medium hover:bg-slate-600 hover:-translate-y-[1px] ",
   secondary:
-    "bg-slate-600 text-white p-2 font-medium hover:-translate-y-[1px] ",
+    "border border-gray-300 text-white p-2 font-medium hover:-translate-y-[1px] ",
   "primary-sm":
     "bg-slate-900 text-white py-1 px-4 text-sm font-medium hover:bg-slate-600",
   link: "text-slate-700 hover:text-slate-400 font-semibold mr-6",
@@ -28,7 +28,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`rounded-md transition-all duration-200 ease-in-out ${buttonTypeClasses[buttonType]}`}
+      className={`flex items-center justify-center rounded-md transition-all duration-200 ease-in-out ${buttonTypeClasses[buttonType]}`}
       data-cy={testProps}
       {...(cb ? { onClick: cb } : {})}
       {...attributes}

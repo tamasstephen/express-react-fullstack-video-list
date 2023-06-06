@@ -13,7 +13,6 @@ const options = {
         password: { label: "password", type: "password" },
       },
       async authorize(credentials, req) {
-        console.log("The credentials are", credentials);
         const res = await fetch("http://localhost:3001/login", {
           method: "POST",
           headers: {
@@ -21,9 +20,11 @@ const options = {
           },
           body: JSON.stringify(credentials),
         });
+        const serverJwt = res.headers.get("set-cookie");
         const data = await res.json();
-        if (res.ok && data["user"]) {
-          return data["user"];
+        if (res.ok && data["user"] && serverJwt) {
+          const parsedServerJwt = serverJwt.split(";")[0].replace("token=", "");
+          return { username: data["user"], sToken: parsedServerJwt };
         }
         return null;
       },
@@ -31,6 +32,20 @@ const options = {
   ],
   pages: {
     signIn: "/login",
+  },
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.username = user.username;
+        token.sToken = user.sToken;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user = token.username;
+      session.sToken = token.sToken;
+      return session;
+    },
   },
 };
 

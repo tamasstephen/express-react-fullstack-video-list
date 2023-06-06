@@ -8,6 +8,7 @@ import { useState } from "react";
 import { FieldValues } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import Div from "@/app/components/Div";
 
 type FormBody = {
   email: string;
@@ -53,7 +54,7 @@ export default function Register() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center w-72">
+    <Div>
       <h1 className="text-4xl font-bold text-center tracking-tighter mb-8 w-full">
         Create your Vidia account
       </h1>
@@ -131,6 +132,6 @@ export default function Register() {
           Continue
         </Button>
       </form>
-    </div>
+    </Div>
   );
 }
