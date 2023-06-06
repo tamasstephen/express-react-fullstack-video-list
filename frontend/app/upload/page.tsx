@@ -10,6 +10,7 @@ import Div from "../components/Div";
 import { useState } from "react";
 import { Session } from "next-auth";
 import ButtonLoad from "../components/ButtonLoad";
+import SnackBar from "../components/form/SnackBar";
 
 interface VidiaSession extends Session {
   sToken: string;
@@ -19,11 +20,12 @@ export default function Upload() {
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseError, setResponseError] = useState<string[]>([]);
+  const [isSnackBarHidden, setIsSnackBarHidden] = useState<boolean>(true);
   const { data: session } = useSession({
     required: true,
   });
@@ -42,12 +44,17 @@ export default function Upload() {
       },
       body: formData,
     });
-    setIsSubmitting(false);
     if (res.ok) {
       const json = await res.json();
+      reset();
+      setIsSnackBarHidden(false);
+      setTimeout(() => {
+        setIsSnackBarHidden(true);
+      }, 3000);
     } else {
       setResponseError(["Could not upload video"]);
     }
+    setIsSubmitting(false);
   }
 
   return (
@@ -55,6 +62,11 @@ export default function Upload() {
       <Div>
         <Heading>Upload your Video</Heading>
         {responseError.length > 0 && <ErrorBar errors={responseError} />}
+        <div className="relative w-full">
+          <SnackBar isHidden={isSnackBarHidden} isAbsolute={false}>
+            <p className="font-bold text-purple-600">Video uploaded!</p>
+          </SnackBar>
+        </div>
         <form
           onSubmit={handleSubmit((data) => submitFile(data))}
           className="grid gap-4 items-center justify-center w-full"
