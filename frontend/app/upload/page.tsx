@@ -9,6 +9,7 @@ import Heading from "../components/Heading";
 import Div from "../components/Div";
 import { useState } from "react";
 import { Session } from "next-auth";
+import ButtonLoad from "../components/ButtonLoad";
 
 interface VidiaSession extends Session {
   sToken: string;
@@ -21,6 +22,7 @@ export default function Upload() {
     watch,
     formState: { errors },
   } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [responseError, setResponseError] = useState<string[]>([]);
   const { data: session } = useSession({
     required: true,
@@ -32,6 +34,7 @@ export default function Upload() {
     formData.append("title", data.title);
     formData.append("description", data.description);
     const mySession = session as VidiaSession;
+    setIsSubmitting(true);
     const res = await fetch("http://localhost:3001/api/video", {
       method: "POST",
       headers: {
@@ -39,6 +42,7 @@ export default function Upload() {
       },
       body: formData,
     });
+    setIsSubmitting(false);
     if (res.ok) {
       const json = await res.json();
     } else {
@@ -91,13 +95,19 @@ export default function Upload() {
           {errors.video && (
             <ErrorBar errors={["Please provide a video file"]} />
           )}
-          <Button
-            buttonType="primary"
-            attributes={{ type: "submit" }}
-            testProps="submit"
-          >
-            Upload
-          </Button>
+          {!isSubmitting ? (
+            <Button
+              buttonType="primary"
+              attributes={{ type: "submit" }}
+              testProps="submit"
+            >
+              Upload
+            </Button>
+          ) : (
+            <ButtonLoad>
+              <p className="font-medium text-primary-text">Submitting...</p>
+            </ButtonLoad>
+          )}
         </form>
       </Div>
     </main>
