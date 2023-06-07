@@ -5,6 +5,7 @@ import { useQuery } from "react-query";
 import Video from "@/app/components/video/video";
 import VideoDetails from "@/app/components/video/VideoDetails";
 import Div from "@/app/components/Div";
+import { dataHandler } from "@/data/api/dataHandler";
 
 function getUserInitials(name: string) {
   return name
@@ -16,13 +17,10 @@ function getUserInitials(name: string) {
 export default function SingleVideoPage() {
   const pathName = usePathname();
   const videoId = pathName.split("/")[2];
-  const { data, status, isLoading, isError, error } = useQuery(
-    `video-${videoId}`,
-    () =>
-      fetch(`http://localhost:3001/api/video/${videoId}/data`).then((res) =>
-        res.json()
-      )
-  );
+  const { data, status, isLoading, isError, error } = useQuery({
+    queryKey: `video-${videoId}`,
+    queryFn: dataHandler.getSingleVideoData,
+  });
   return (
     <div className="mt-8 mb-24">
       <Div width="large">
@@ -30,7 +28,7 @@ export default function SingleVideoPage() {
         {isLoading ? (
           <p>Loading...</p>
         ) : isError ? (
-          <p>Error: {error as string}</p>
+          <p>Unable to load data</p>
         ) : (
           <VideoDetails
             title={data.title}

@@ -1,4 +1,4 @@
-const LikeCountView = ({ likeCount }: { likeCount: number }) => {
+const LikeCount = ({ likeCount }: { likeCount: number }) => {
   return (
     <div>
       <p className="text-sm text-gray-500">{likeCount} likes</p>
@@ -6,4 +6,4 @@ const LikeCountView = ({ likeCount }: { likeCount: number }) => {
   );
 };
 
-export default LikeCountView;
+export default LikeCount;
