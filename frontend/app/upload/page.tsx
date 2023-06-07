@@ -37,7 +37,7 @@ export default function Upload() {
     formData.append("description", data.description);
     const mySession = session as VidiaSession;
     setIsSubmitting(true);
-    const res = await fetch("http://localhost:3001/api/video", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/api/video`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${mySession?.sToken}`,

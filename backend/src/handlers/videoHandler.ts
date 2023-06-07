@@ -70,21 +70,24 @@ export const streamVideo = async (id: string, req: Request, res: Response) => {
 };
 
 export const getVideoData = async (id: string, req: Request, res: Response) => {
-  const video = await getVideoById(id);
-  console.log(video);
-  if (video) {
-    res.json({
-      id: video.id,
-      title: video.title,
-      description: video.description,
-      originalFileName: video.originalFileName,
-      createdAt: video.createdAt,
-      user: {
-        name: video.user.name,
-      },
-      likes: video.likes.length,
-    });
-  } else {
-    res.sendStatus(404);
+  try {
+    const video = await getVideoById(id);
+    if (video) {
+      res.json({
+        id: video.id,
+        title: video.title,
+        description: video.description,
+        originalFileName: video.originalFileName,
+        createdAt: video.createdAt,
+        user: {
+          name: video.user.name,
+        },
+        likes: video.likes.length,
+      });
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (err) {
+    return res.sendStatus(500);
   }
 };

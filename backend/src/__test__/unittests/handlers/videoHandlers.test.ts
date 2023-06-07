@@ -1,4 +1,8 @@
-import { saveVideo, streamVideo } from "../../../handlers/videoHandler";
+import {
+  saveVideo,
+  streamVideo,
+  getVideoData,
+} from "../../../handlers/videoHandler";
 import type { Request, Response } from "express";
 import { getBearerToken, decodeJWT } from "../../../utils/auth";
 import { createVideo, getVideoById } from "../../../data/video";
@@ -171,5 +175,74 @@ describe("streamVideo", () => {
     await streamVideo(mockVideoId, mockReq, mockRes);
 
     expect(mockRes.sendStatus).toHaveBeenCalledWith(404);
+  });
+});
+
+describe("getVideoData", () => {
+  let mockReq: any;
+  let mockRes: any;
+
+  beforeEach(() => {
+    mockReq = {};
+
+    mockRes = {
+      json: jest.fn(),
+      sendStatus: jest.fn(),
+    };
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should return video data when the video exists", async () => {
+    const mockVideo = {
+      id: "video-id",
+      title: "Test Title",
+      description: "Test Description",
+      originalFileName: "video.mp4",
+      createdAt: "2023-05-30T12:00:00.000Z",
+      user: {
+        name: "John Doe",
+      },
+      likes: ["user1", "user2"],
+    };
+
+    (getVideoById as jest.Mock).mockResolvedValueOnce(mockVideo);
+
+    await getVideoData(mockVideo.id, mockReq, mockRes);
+
+    expect(mockRes.json).toHaveBeenCalledWith({
+      id: mockVideo.id,
+      title: mockVideo.title,
+      description: mockVideo.description,
+      originalFileName: mockVideo.originalFileName,
+      createdAt: mockVideo.createdAt,
+      user: {
+        name: mockVideo.user.name,
+      },
+      likes: mockVideo.likes.length,
+    });
+  });
+
+  it("should send a 404 status when the video does not exist", async () => {
+    const mockVideoId = "non-existent-video-id";
+
+    (getVideoById as jest.Mock).mockResolvedValueOnce(null);
+
+    await getVideoData(mockVideoId, mockReq, mockRes);
+
+    expect(mockRes.sendStatus).toHaveBeenCalledWith(404);
+  });
+
+  it("should send a 500 status when an error occurs", async () => {
+    const mockVideoId = "video-id";
+    const mockError = new Error("Something went wrong");
+
+    (getVideoById as jest.Mock).mockRejectedValueOnce(mockError);
+
+    await getVideoData(mockVideoId, mockReq, mockRes);
+
+    expect(mockRes.sendStatus).toHaveBeenCalledWith(500);
   });
 });

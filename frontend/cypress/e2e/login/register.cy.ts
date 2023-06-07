@@ -2,7 +2,7 @@
 
 describe("Login", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/register");
+    cy.visit(Cypress.env("REGISTER"));
     cy.get('[data-cy="email"]').as("email");
     cy.get('[data-cy="username"]').as("username");
     cy.get('[data-cy="password"]').as("password");
@@ -26,7 +26,7 @@ describe("Login", () => {
   });
 
   it("should fire submit function with valid input value", () => {
-    cy.intercept("POST", "http://localhost:3001/register", {
+    cy.intercept("POST", `${Cypress.env("API")}/register`, {
       statusCode: 200,
       body: {
         user: {

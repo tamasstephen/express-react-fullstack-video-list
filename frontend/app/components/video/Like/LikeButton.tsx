@@ -1,11 +1,11 @@
-interface LikeViewProps {
+interface LikeButtonProps {
   wasLikedByUser: boolean;
 }
 
 import Image from "next/image";
 import Button from "../../Button";
 
-const LikeView = ({ wasLikedByUser }: LikeViewProps) => {
+const LikeButton = ({ wasLikedByUser }: LikeButtonProps) => {
   const activeStyle = wasLikedByUser ? "text-red-500" : "text-gray-700";
   return (
     /*   <div
@@ -20,4 +20,4 @@ const LikeView = ({ wasLikedByUser }: LikeViewProps) => {
   );
 };
 
-export default LikeView;
+export default LikeButton;

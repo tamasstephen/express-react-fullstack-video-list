@@ -18,11 +18,15 @@ export default function VideoDetails({
   return (
     <div className="w-full pt-4 pb-8 flex-col">
       <div className="grid gap-4 mb-4">
-        <p className="text-2xl font-bold text-zinc-700">{title}</p>
+        <p data-cy="title" className="text-2xl font-bold text-zinc-700">
+          {title}
+        </p>
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <UserIcon initials={user.initials} size="small" />
-            <p className="text-lg ml-2">{user.name}</p>
+            <p data-cy="video-user-name" className="text-lg ml-2">
+              {user.name}
+            </p>
           </div>
           <Like />
         </div>
