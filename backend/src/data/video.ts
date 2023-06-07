@@ -1,6 +1,10 @@
 import type { VideoParam } from "../types";
 import prisma from "./prisma";
 
+type VideoQueryPayLoad = Omit<VideoParam, "userId"> & {
+  user: { connect: { id: string } };
+};
+
 export const createVideo = async ({
   title,
   description,
@@ -8,20 +12,25 @@ export const createVideo = async ({
   fileName,
   originalFileName,
   userId,
+  thumbnailPath,
 }: VideoParam) => {
-  const video = await prisma.video.create({
-    data: {
-      title,
-      description,
-      path,
-      fileName,
-      originalFileName,
-      user: {
-        connect: {
-          id: userId,
-        },
+  const dataPayload: VideoQueryPayLoad = {
+    title,
+    description,
+    path,
+    fileName,
+    originalFileName,
+    user: {
+      connect: {
+        id: userId,
       },
     },
+  };
+  if (thumbnailPath) {
+    dataPayload.thumbnailPath = thumbnailPath;
+  }
+  const video = await prisma.video.create({
+    data: dataPayload,
   });
   return video;
 };

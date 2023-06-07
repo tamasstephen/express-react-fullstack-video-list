@@ -1,5 +1,5 @@
 import { createVideo, getVideoById } from "../data/video";
-import type { VideoRequest } from "../types";
+import type { VideoParam, VideoRequest } from "../types";
 import { decodeJWT, getBearerToken } from "../utils/auth";
 import type { Request, Response } from "express";
 import fs from "fs";
@@ -17,14 +17,18 @@ export const saveVideo = async (req: VideoRequest, res: Response) => {
     if (!token || !token["id"]) {
       return res.status(401).json({ error: "Not authorized" });
     }
-    const video = await createVideo({
+    const payload: VideoParam & { userId: string } = {
       title,
       description,
       path,
       fileName,
       originalFileName,
       userId: token["id"],
-    });
+    };
+    if (req?.body?.thumbnailPath) {
+      payload.thumbnailPath = req.body.thumbnailPath;
+    }
+    const video = await createVideo(payload);
     if (video) {
       res.json({
         message: "Video saved successfully",

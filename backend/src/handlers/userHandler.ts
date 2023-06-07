@@ -25,6 +25,7 @@ export const handleLogin = async (req: Request, res: Response) => {
       user: { name: user.name },
     });
   } catch (err) {
+    console.log("erro", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };

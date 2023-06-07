@@ -4,7 +4,7 @@ import {
   handleRegister,
 } from "../handlers/userHandler";
 import { protectRoute } from "../utils/auth";
-import type { Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { Router } from "express";
 import { body, validationResult } from "express-validator";
 

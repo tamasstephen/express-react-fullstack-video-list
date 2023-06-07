@@ -9,7 +9,10 @@ export const videoRouter = Router();
 videoRouter.post(
   "/video",
   protectRoute,
-  videoUpload.single("video"),
+  videoUpload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
   (req: VideoRequest, res) => {
     if (req.body?.error) {
       return res.status(500).json(req.body.error);
