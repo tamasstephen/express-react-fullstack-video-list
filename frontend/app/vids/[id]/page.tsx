@@ -9,9 +9,9 @@ import { dataHandler } from "@/data/api/dataHandler";
 
 function getUserInitials(name: string) {
   return name
-    .split(" ")
-    .map((name) => name.charAt(0))
-    .join("");
+    ?.split(" ")
+    ?.map((name) => name.charAt(0))
+    ?.join("");
 }
 
 export default function SingleVideoPage() {
@@ -28,14 +28,14 @@ export default function SingleVideoPage() {
         {isLoading ? (
           <p>Loading...</p>
         ) : isError ? (
-          <p>Unable to load data</p>
+          <p data-cy="video-error">Unable to load data</p>
         ) : (
           <VideoDetails
             title={data.title}
             description={data.description}
             user={{
-              initials: getUserInitials(data.user.name),
-              name: data.user.name,
+              initials: getUserInitials(data?.user?.name),
+              name: data?.user?.name,
             }}
           />
         )}

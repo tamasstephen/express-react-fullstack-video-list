@@ -2,7 +2,7 @@
 
 describe("Login", () => {
   beforeEach(() => {
-    cy.visit(`${process.env.NEXT_PUBLIC_API}/login`);
+    cy.visit(Cypress.env("LOGIN"));
     cy.get('[data-cy="email"]').as("email");
     cy.get('[data-cy="password"]').as("password");
     cy.get('[data-cy="submit"]').as("submit");
