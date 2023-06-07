@@ -2,7 +2,7 @@
 
 describe("Login", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/login");
+    cy.visit(`${process.env.NEXT_PUBLIC_API}/login`);
     cy.get('[data-cy="email"]').as("email");
     cy.get('[data-cy="password"]').as("password");
     cy.get('[data-cy="submit"]').as("submit");

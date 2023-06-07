@@ -18,7 +18,7 @@ export default function UserWidget() {
   }
 
   async function handleLogout() {
-    const res = await fetch(`http://localhost:3001/logout`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API}/logout`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

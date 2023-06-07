@@ -7,7 +7,7 @@ export const dataHandler = {
     const videoId = (id as string).replace("video-", "");
     if (!videoId) throw new Error("videoId is required");
     const response = await fetch(
-      `http://localhost:3001/api/video/${videoId}/data`
+      `${process.env.NEXT_PUBLIC_API}/api/video/${videoId}/data`
     );
     if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
