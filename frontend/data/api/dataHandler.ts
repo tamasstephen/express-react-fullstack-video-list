@@ -14,7 +14,6 @@ export const dataHandler = {
     const data = await response.json();
     return data;
   },
-
   getVideoListData: async ({ queryKey }: UseQueryOptions) => {
     if (!queryKey || !queryKey[1]) throw new Error("queryKey is required");
     const page = queryKey[1];

@@ -1,5 +1,6 @@
 import {
   getVideoData,
+  getVideoListData,
   getVideoThumbnail,
   saveVideo,
   streamVideo,
@@ -26,8 +27,10 @@ videoRouter.post(
   }
 );
 
-videoRouter.get("/video", (_req, res) => {
-  res.json("Hello video route!");
+videoRouter.get("/video", (req, res) => {
+  const rawPage = req.query.page;
+  const page = rawPage ? parseInt(rawPage as string) : 1;
+  getVideoListData(page, req, res);
 });
 
 videoRouter.get("/video/:id", (req, res) => {
