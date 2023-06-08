@@ -33,6 +33,7 @@ export default function Upload() {
   async function submitFile(data: FieldValues) {
     const formData = new FormData();
     formData.append("video", data.video[0]);
+    formData.append("thumbnail", data.thumbnail[0]);
     formData.append("title", data.title);
     formData.append("description", data.description);
     const mySession = session as VidiaSession;
@@ -107,6 +108,19 @@ export default function Upload() {
           {errors.video && (
             <ErrorBar errors={["Please provide a video file"]} />
           )}
+          <Input
+            label="thumbnail"
+            htmlProps={{
+              type: "file",
+              id: "thumbnail",
+              name: "thumbnail",
+              accept: "image/*",
+            }}
+            testProps="thumbnail"
+            isRequired={false}
+            register={register}
+          />
+          {errors.video && <ErrorBar errors={["Please provide an image"]} />}
           {!isSubmitting ? (
             <Button
               buttonType="primary"

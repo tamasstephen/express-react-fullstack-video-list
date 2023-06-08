@@ -9,11 +9,9 @@ export const dataHandler = {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API}/api/video/${videoId}/data`
     );
-    console.log(response);
     if (!response.ok || response.status !== 200)
       throw new Error("Network response was not ok");
     const data = await response.json();
-    console.log(data);
     return data;
   },
 };
