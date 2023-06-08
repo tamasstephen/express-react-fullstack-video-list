@@ -1,4 +1,4 @@
-import { createVideo, getVideoById } from "../data/video";
+import { createVideo, getVideoById, getVideos } from "../data/video";
 import type { VideoParam, VideoRequest } from "../types";
 import { decodeJWT, getBearerToken } from "../utils/auth";
 import type { Request, Response } from "express";
@@ -93,5 +93,18 @@ export const getVideoData = async (id: string, req: Request, res: Response) => {
     }
   } catch (err) {
     return res.sendStatus(500);
+  }
+};
+
+export const getVideoListData = async (
+  page: number,
+  req: Request,
+  res: Response
+) => {
+  const videos = await getVideos(page);
+  if (videos) {
+    res.json({ videos });
+  } else {
+    res.sendStatus(404);
   }
 };
