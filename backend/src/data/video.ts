@@ -47,3 +47,15 @@ export const getVideoById = async (id: string) => {
   });
   return video;
 };
+
+export const getVideos = async (page: number) => {
+  const videos = await prisma.video.findMany({
+    skip: (page - 1) * 10,
+    take: 10,
+    include: {
+      user: true,
+      likes: true,
+    },
+  });
+  return videos;
+};
