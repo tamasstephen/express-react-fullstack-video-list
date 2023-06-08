@@ -3,6 +3,7 @@ import type { VideoParam, VideoRequest } from "../types";
 import { decodeJWT, getBearerToken } from "../utils/auth";
 import type { Request, Response } from "express";
 import fs from "fs";
+import path from "path";
 
 export const saveVideo = async (req: VideoRequest, res: Response) => {
   try {
@@ -37,6 +38,7 @@ export const saveVideo = async (req: VideoRequest, res: Response) => {
       return video;
     }
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ error: err });
   }
 };
@@ -93,6 +95,36 @@ export const getVideoData = async (id: string, req: Request, res: Response) => {
     }
   } catch (err) {
     return res.sendStatus(500);
+  }
+};
+
+export const getVideoThumbnail = async (
+  id: string,
+  req: Request,
+  res: Response
+) => {
+  const video = await getVideoById(id);
+  if (video) {
+    const path = video.thumbnailPath;
+    if (path) {
+      const fileSize = fs.statSync(path).size;
+      const extension = path.split(".").pop();
+      fs.readFile(path, (err, data) => {
+        if (err || !extension) {
+          res.sendStatus(404);
+        } else {
+          res.writeHead(200, {
+            "Content-Length": fileSize,
+            "Content-Type": `image/${extension}`,
+          });
+          res.end(data, "utf-8");
+        }
+      });
+    } else {
+      res.sendStatus(404);
+    }
+  } else {
+    res.sendStatus(404);
   }
 };
 
