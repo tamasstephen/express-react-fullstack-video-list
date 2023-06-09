@@ -5,6 +5,24 @@ type VideoQueryPayLoad = Omit<VideoParam, "userId"> & {
   user: { connect: { id: string } };
 };
 
+const videoPayload = {
+  select: {
+    title: true,
+    description: true,
+    thumbnailPath: true,
+    createdAt: true,
+    originalFileName: true,
+    path: true,
+    id: true,
+    user: {
+      select: {
+        name: true,
+      },
+    },
+    likes: true,
+  },
+} as const;
+
 export const createVideo = async ({
   title,
   description,
@@ -40,10 +58,7 @@ export const getVideoById = async (id: string) => {
     where: {
       id,
     },
-    include: {
-      user: true,
-      likes: true,
-    },
+    ...videoPayload,
   });
   return video;
 };
@@ -52,10 +67,7 @@ export const getVideos = async (page: number) => {
   const videos = await prisma.video.findMany({
     skip: (page - 1) * 10,
     take: 10,
-    include: {
-      user: true,
-      likes: true,
-    },
+    ...videoPayload,
   });
   return videos;
 };

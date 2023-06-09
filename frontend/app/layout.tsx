@@ -23,7 +23,7 @@ export default function RootLayout({
         <SessionProviderWrapper>
           <ReactQueryWrapper>
             <Navigation />
-            {children}
+            <div className="pt-20">{children}</div>
           </ReactQueryWrapper>
         </SessionProviderWrapper>
       </body>

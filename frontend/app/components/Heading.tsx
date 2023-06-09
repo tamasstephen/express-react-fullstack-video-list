@@ -7,7 +7,9 @@ export default function Heading({
 }) {
   return (
     <h1
-      className={`text-4xl font-bold text-center tracking-tighter mb-8 w-full ${align}`}
+      className={`text-4xl font-bold tracking-tighter mb-8 w-full ${
+        align ? align : "text-center"
+      }`}
     >
       {children}
     </h1>

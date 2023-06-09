@@ -4,15 +4,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import UserIcon from "./UserIcon";
+import { userUtils } from "@/app/utils/utils";
 
 export default function UserWidget() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const myRef = useClickOutSide(() => setIsMenuOpen(false));
   const { data: session } = useSession();
   const userInitials = session?.user?.name
-    ?.split(" ")
-    .map((name: string) => name[0])
-    .join("");
+    ? userUtils.getNameInitials(session.user.name)
+    : "";
   function handleClick() {
     setIsMenuOpen((prev) => !prev);
   }
