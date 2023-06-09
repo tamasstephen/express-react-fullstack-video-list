@@ -3,6 +3,7 @@ import VideoCover from "./VideoCover";
 import VideoData from "./VideoData";
 import { useQuery } from "react-query";
 import { useState } from "react";
+import Link from "next/link";
 
 const VideoItem = ({ video }: { video: VideoPayload }) => {
   const [image, setImage] = useState<{ src: string; img?: Blob }>({
@@ -19,8 +20,10 @@ const VideoItem = ({ video }: { video: VideoPayload }) => {
   });
   return (
     <div className="w-full">
-      <VideoCover data={image} />
-      <VideoData data={video} />
+      <Link href={`/vids/${video.id}`}>
+        <VideoCover data={image} />
+        <VideoData data={video} />
+      </Link>
     </div>
   );
 };
