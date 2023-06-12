@@ -27,6 +27,7 @@ model Video {
   title     String
   description String
   path       String
+  thumbnailPath String?
   fileName   String
   originalFileName String
   createdAt DateTime @default(now())

@@ -9,10 +9,14 @@ const videoStorage = multer.diskStorage({
     const videoDir = path.resolve(__dirname, "../../video");
     const fileName = `${Date.now()}${path.extname(file.originalname)}`;
     try {
+      if (file.fieldname === "thumbnail") {
+        req.body.thumbnailPath = `${videoDir}/${fileName}`;
+      } else if (file.fieldname === "video") {
+        req.body.path = `${videoDir}/${fileName}`;
+        req.body.fileName = fileName;
+        req.body.originalFileName = file.originalname;
+      }
       cb(null, fileName);
-      req.body.path = `${videoDir}/${fileName}`;
-      req.body.fileName = fileName;
-      req.body.originalFileName = file.originalname;
     } catch (err) {
       console.log(err);
       req.body.error = err;

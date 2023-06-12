@@ -162,4 +162,4 @@ dist
 ### Jest
 output/
 
-video/**.mp4
+video/

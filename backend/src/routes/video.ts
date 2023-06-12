@@ -1,4 +1,10 @@
-import { getVideoData, saveVideo, streamVideo } from "../handlers/videoHandler";
+import {
+  getVideoData,
+  getVideoListData,
+  getVideoThumbnail,
+  saveVideo,
+  streamVideo,
+} from "../handlers/videoHandler";
 import { videoUpload } from "../middlewares/video.middleware";
 import type { VideoRequest } from "../types";
 import { protectRoute } from "../utils/auth";
@@ -9,7 +15,10 @@ export const videoRouter = Router();
 videoRouter.post(
   "/video",
   protectRoute,
-  videoUpload.single("video"),
+  videoUpload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "video", maxCount: 1 },
+  ]),
   (req: VideoRequest, res) => {
     if (req.body?.error) {
       return res.status(500).json(req.body.error);
@@ -18,8 +27,10 @@ videoRouter.post(
   }
 );
 
-videoRouter.get("/video", (_req, res) => {
-  res.json("Hello video route!");
+videoRouter.get("/video", (req, res) => {
+  const rawPage = req.query.page;
+  const page = rawPage ? parseInt(rawPage as string) : 1;
+  getVideoListData(page, req, res);
 });
 
 videoRouter.get("/video/:id", (req, res) => {
@@ -30,4 +41,9 @@ videoRouter.get("/video/:id", (req, res) => {
 videoRouter.get("/video/:id/data", (req, res) => {
   const id = req.params.id;
   getVideoData(id, req, res);
+});
+
+videoRouter.get("/video/:videoId/thumbnail", (req, res) => {
+  const id = req.params.videoId;
+  getVideoThumbnail(id, req, res);
 });

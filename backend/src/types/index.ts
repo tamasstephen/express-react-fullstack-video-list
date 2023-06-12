@@ -7,6 +7,7 @@ export interface VideoParam {
   fileName: string;
   originalFileName: string;
   userId: string;
+  thumbnailPath?: string;
 }
 
 export interface VideoRequest extends Request {

@@ -12,7 +12,7 @@ export default function Navigation() {
   const { data: session } = useSession();
 
   return (
-    <nav className="flex items-center justify-center flex-wrap border-b border-gray-300 p-4 w-full">
+    <nav className="fixed bg-white flex items-center justify-center flex-wrap border-b border-gray-300 p-4 w-full">
       <Wrapper>
         <div className="flex justify-between w-full">
           <div className="flex items-center text-gray-800">
