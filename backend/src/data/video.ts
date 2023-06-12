@@ -69,5 +69,9 @@ export const getVideos = async (page: number) => {
     take: 10,
     ...videoPayload,
   });
-  return videos;
+  const hasNextPage = await prisma.video.count({
+    skip: page * 10,
+  });
+  //videos.push({ hasNextPage: hasNextPage > 0 });
+  return { videos: videos, hasNextPage: hasNextPage > 0 ? page + 1 : null };
 };

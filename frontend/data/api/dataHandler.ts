@@ -1,4 +1,4 @@
-import { UseQueryOptions } from "react-query";
+import { UseInfiniteQueryOptions, UseQueryOptions } from "react-query";
 
 export const dataHandler = {
   getSingleVideoData: async ({ queryKey }: UseQueryOptions) => {
@@ -15,11 +15,9 @@ export const dataHandler = {
     return data;
   },
 
-  getVideoListData: async ({ queryKey }: UseQueryOptions) => {
-    if (!queryKey || !queryKey[1]) throw new Error("queryKey is required");
-    const page = queryKey[1];
+  getVideoListData: async ({ pageParam = 1 }: UseInfiniteQueryOptions) => {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API}/api/video?page=${page}`
+      `${process.env.NEXT_PUBLIC_API}/api/video?page=${pageParam}`
     );
     if (!response.ok || response.status !== 200)
       throw new Error("Network response was not ok");

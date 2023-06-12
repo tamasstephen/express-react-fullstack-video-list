@@ -135,7 +135,7 @@ export const getVideoListData = async (
 ) => {
   const videos = await getVideos(page);
   if (videos) {
-    res.json({ videos });
+    res.json({ ...videos });
   } else {
     res.sendStatus(404);
   }
